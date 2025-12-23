@@ -9,7 +9,7 @@ const router = useRouter()
 // Mock data - in a real app this would be fetched based on route.params.id
 const article = {
   title: 'The Ultimate Guide to High-Fiber Foods for Better Digestion',
-  author: 'Dr. Sarah Ahmed',
+  author: 'Dr. Saleh Ahmed',
   date: 'December 15, 2024',
   readTime: '8 min read',
   image: 'https://images.unsplash.com/photo-1623341214825-9f4f963727d5?q=80&w=2072&auto=format&fit=crop',

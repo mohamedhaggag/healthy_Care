@@ -1,45 +1,10 @@
 <template>
   <div class="flex h-screen bg-[#f8faff]">
-    <!-- Sidebar -->
-    <aside class="w-64 bg-[#0a4d8c] text-white flex flex-col py-8 px-4">
-      <div class="flex items-center gap-3 px-4 mb-16">
-        <div class="w-10 h-10 bg-white rounded-full flex items-center justify-center">
-          <img src="/vite.svg" alt="Logo" class="w-6 h-6" />
-        </div>
-        <span class="font-bold text-lg tracking-wide">HEALTHY CARE</span>
-      </div>
-
-      <nav class="flex-1 space-y-2">
-        <router-link 
-          to="/doctor-dashboard" 
-          class="flex items-center gap-4 px-4 py-3 bg-white text-[#0a4d8c] rounded-xl font-medium transition-all"
-        >
-          <font-awesome-icon icon="th-large" width="20" />
-          <span>over view</span>
-        </router-link>
-        
-        <a href="#" class="flex items-center gap-4 px-4 py-3 text-white/70 hover:bg-white/10 rounded-xl transition-all">
-          <font-awesome-icon icon="users" width="20" />
-          <span>Clients</span>
-        </a>
-
-        <a href="#" class="flex items-center gap-4 px-4 py-3 text-white/70 hover:bg-white/10 rounded-xl transition-all">
-          <font-awesome-icon icon="comment-dots" width="20" />
-          <span>Message</span>
-        </a>
-
-        <button 
-          @click="handleLogout"
-          class="flex items-center gap-4 px-4 py-3 text-red-300 hover:bg-red-500/10 rounded-xl transition-all mt-auto"
-        >
-          <font-awesome-icon icon="sign-out-alt" width="20" />
-          <span>Logout</span>
-        </button>
-      </nav>
-    </aside>
+    <!-- Shared Sidebar -->
+    <DoctorSidebar />
 
     <!-- Main Content -->
-    <main class="flex-1 overflow-y-auto p-10">
+    <main class="flex-1 overflow-y-auto ml-64 p-10 animate-fade-in">
       <!-- Header -->
       <header class="flex justify-between items-center mb-10">
         <h1 class="text-2xl font-bold text-[#0a4d8c]">Over View</h1>
@@ -56,7 +21,7 @@
         <div class="col-span-8 space-y-8">
           
           <!-- Stats Cards -->
-          <div class="grid grid-cols-3 gap-6">
+          <div class="grid grid-cols-3 gap-6 animate-slide-up">
             <div class="bg-[#c2d6ff] p-6 rounded-3xl flex justify-between items-start">
               <div>
                 <p class="text-slate-600 text-sm mb-1">Active Clients</p>
@@ -67,7 +32,7 @@
               </div>
             </div>
 
-            <div class="bg-[#c2d6ff] p-6 rounded-3xl flex justify-between items-start">
+            <div class="bg-[#c2d6ff] p-6 rounded-3xl flex justify-between items-start transition-all duration-300 hover:scale-105 hover:shadow-lg cursor-pointer">
               <div>
                 <p class="text-slate-600 text-sm mb-1">Overall Compliance</p>
                 <h3 class="text-4xl font-bold text-[#0a4d8c]">78%</h3>
@@ -89,7 +54,7 @@
           </div>
 
           <!-- Clients Need Follow-up -->
-          <div class="bg-white p-8 rounded-[40px] shadow-sm border border-slate-100">
+          <div class="bg-white p-8 rounded-[40px] shadow-sm border border-slate-100 animate-slide-up delay-200">
             <div class="flex justify-between items-center mb-8">
               <div class="flex items-center gap-4">
                 <div class="w-10 h-10 bg-orange-100 text-orange-500 rounded-xl flex items-center justify-center">
@@ -100,14 +65,14 @@
                   <p class="text-xs text-slate-400">3 clients require attention</p>
                 </div>
               </div>
-              <button class="text-xs font-semibold text-slate-500 border border-slate-200 px-4 py-2 rounded-xl hover:bg-slate-50">View All</button>
+              <router-link to="/doctor-clients" class="text-xs font-semibold text-slate-500 border border-slate-200 px-4 py-2 rounded-xl hover:bg-slate-50">View All</router-link>
             </div>
 
             <div class="space-y-4">
               <div v-for="i in 3" :key="i" class="flex items-center justify-between p-4 bg-white border border-slate-50 rounded-3xl hover:shadow-md transition-shadow">
                 <div class="flex items-center gap-4">
                   <div class="w-12 h-12 rounded-full overflow-hidden bg-slate-200">
-                    <img src="https://i.pravatar.cc/150?u=mohamed" alt="Avatar" />
+                    <img src="https://randomuser.me/api/portraits/men/32.jpg" alt="Avatar" />
                   </div>
                   <div>
                     <div class="flex items-center gap-2">
@@ -120,16 +85,22 @@
                     </div>
                   </div>
                 </div>
-                <button class="bg-[#00c288] text-white px-4 py-2 rounded-xl text-xs font-medium flex items-center gap-2">
-                  <font-awesome-icon icon="comment" />
-                  Contact
-                </button>
+                <div class="flex gap-2">
+                  <router-link to="/doctor-client-details/1" class="bg-slate-50 text-slate-600 px-4 py-2 rounded-xl text-xs font-medium flex items-center gap-2 hover:bg-slate-100 transition-all">
+                    <font-awesome-icon icon="eye" />
+                    View
+                  </router-link>
+                  <router-link to="/doctor-messages" class="bg-[#00c288] text-white px-4 py-2 rounded-xl text-xs font-medium flex items-center gap-2">
+                    <font-awesome-icon icon="comment" />
+                    Contact
+                  </router-link>
+                </div>
               </div>
             </div>
           </div>
 
           <!-- Client Activity Overview -->
-          <div class="bg-white p-8 rounded-[40px] shadow-sm border border-slate-100">
+          <div class="bg-white p-8 rounded-[40px] shadow-sm border border-slate-100 animate-slide-up delay-300">
              <div class="flex items-center gap-4 mb-8">
                 <div class="w-10 h-10 bg-blue-100 text-blue-500 rounded-xl flex items-center justify-center">
                   <font-awesome-icon icon="chart-bar" />
@@ -173,7 +144,7 @@
         <div class="col-span-4 space-y-8">
           
           <!-- Today's Schedule -->
-          <div class="bg-white p-6 rounded-[40px] shadow-sm border border-slate-100">
+          <div class="bg-white p-6 rounded-[40px] shadow-sm border border-slate-100 animate-slide-up delay-200">
              <div class="flex items-center gap-4 mb-6">
                 <div class="w-10 h-10 bg-purple-100 text-purple-500 rounded-xl flex items-center justify-center">
                   <font-awesome-icon icon="calendar-check" />
@@ -187,7 +158,7 @@
               <div class="space-y-4">
                 <div v-for="i in 4" :key="i" class="flex items-center justify-between p-3 border-b border-slate-50 last:border-0">
                   <div class="flex items-center gap-3">
-                    <img src="https://i.pravatar.cc/100?u=lol" class="w-10 h-10 rounded-full" />
+                    <img src="https://randomuser.me/api/portraits/men/44.jpg" class="w-10 h-10 rounded-full" />
                     <div>
                       <p class="text-sm font-bold text-slate-800">lol</p>
                       <p class="text-[10px] text-slate-400">
@@ -213,7 +184,7 @@
           </div>
 
           <!-- Pro Tip -->
-          <div class="bg-[#c2d6ff] p-8 rounded-[40px] relative overflow-hidden">
+          <div class="bg-[#c2d6ff] p-8 rounded-[40px] relative overflow-hidden animate-slide-up delay-300">
              <div class="relative z-10">
                 <div class="flex items-start gap-4 mb-4">
                   <span class="text-2xl">💡</span>
@@ -228,7 +199,6 @@
           </div>
 
         </div>
-
       </div>
     </main>
   </div>
@@ -236,16 +206,34 @@
 
 <script setup>
 import { useRouter } from 'vue-router'
+import DoctorSidebar from '../components/DoctorSidebar.vue'
 
 const router = useRouter()
-
-const handleLogout = () => {
-  localStorage.removeItem('doctor_auth')
-  router.push('/login')
-}
 </script>
 
 <style scoped>
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.8s ease-out forwards;
+}
+
+.animate-slide-up {
+  opacity: 0;
+  animation: slideUp 0.6s ease-out forwards;
+}
+
+.delay-200 { animation-delay: 0.2s; }
+.delay-300 { animation-delay: 0.3s; }
+
 /* Specific styles if Tailwind isn't enough */
 .scrollbar-hide::-webkit-scrollbar {
   display: none;

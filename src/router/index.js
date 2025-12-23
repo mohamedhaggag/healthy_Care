@@ -80,6 +80,24 @@ const router = createRouter({
             name: 'doctor-dashboard',
             component: () => import('../views/DoctorDashboardView.vue'),
             meta: { requiresAuth: true }
+        },
+        {
+            path: '/doctor-clients',
+            name: 'doctor-clients',
+            component: () => import('../views/ClientsView.vue'),
+            meta: { requiresAuth: true }
+        },
+        {
+            path: '/doctor-client-details/:id',
+            name: 'doctor-client-details',
+            component: () => import('../views/ClientDetailsView.vue'),
+            meta: { requiresAuth: true }
+        },
+        {
+            path: '/doctor-messages',
+            name: 'doctor-messages',
+            component: () => import('../views/MessagesView.vue'),
+            meta: { requiresAuth: true }
         }
     ],
     scrollBehavior(to, from, savedPosition) {

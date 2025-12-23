@@ -25,13 +25,13 @@ const doctor = {
   ],
   successStories: [
     {
-      name: 'Sara Ahmed',
+      name: 'Samy Ahmed',
       duration: '4 months journey',
-      image: 'https://placehold.co/100x100/eefbf2/0ca84d?text=Sara',
+      image: 'https://placehold.co/100x100/eefbf2/0ca84d?text=Samy',
       before: '90 kg',
       after: '65 kg',
       result: 'Lost 25 lbs & reversed pre-diabetes',
-      quote: '"Dr. Sarah completely changed my life. I struggled with weight for 20 years, trying every diet imaginable. Her personalized approach, and understanding of gut health helped me finally achieve sustainable weight loss. I\'ve kept the weight off for over 2 years now!"'
+      quote: '"Dr. Ahmed completely changed my life. I struggled with weight for 20 years, trying every diet imaginable. His personalized approach, and understanding of gut health helped me finally achieve sustainable weight loss. I\'ve kept the weight off for over 2 years now!"'
     },
     {
       name: 'John Doe',
@@ -43,9 +43,9 @@ const doctor = {
       quote: '"I never thought I could feel this good again. Dr. Ahmed\'s plan was easy to follow and didn\'t feel like a diet. I have more energy than I did in my 20s!"'
     },
      {
-      name: 'Emily Chen',
+      name: 'Emad Chen',
       duration: '3 months journey',
-      image: 'https://placehold.co/100x100/eefbf2/0ca84d?text=Emily',
+      image: 'https://placehold.co/100x100/eefbf2/0ca84d?text=Emad',
       before: '75 kg',
       after: '60 kg',
       result: 'Lost 15 kg & better digestion',

@@ -57,8 +57,8 @@ const handleLogin = () => {
         <!-- Left Side - Image -->
         <div class="hidden lg:block relative h-[600px] rounded-2xl overflow-hidden">
           <img 
-            src="https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?q=80&w=2070&auto=format&fit=crop" 
-            alt="Active senior person" 
+            src="https://images.unsplash.com/photo-1483721310020-03333e577078?q=80&w=2128&auto=format&fit=crop" 
+            alt="Man running in a green field" 
             class="w-full h-full object-cover"
           />
         </div>

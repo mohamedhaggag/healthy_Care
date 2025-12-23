@@ -13,9 +13,9 @@ const experts = [
     tags: ['Workout', 'Strength']
   },
   {
-    name: 'Dr. Anna Chan',
+    name: 'Dr. Adam Chen',
     role: 'Holistic Health',
-    image: 'https://placehold.co/400x500/eefbf2/0ca84d?text=Dr+Anna',
+    image: 'https://placehold.co/400x500/eefbf2/0ca84d?text=Dr+Adam',
     tags: ['Mental', 'Yoga']
   },
 ]
