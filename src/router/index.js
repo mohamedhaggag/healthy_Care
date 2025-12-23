@@ -74,6 +74,12 @@ const router = createRouter({
             path: '/order-complete',
             name: 'order-complete',
             component: () => import('../views/OrderCompleteView.vue')
+        },
+        {
+            path: '/doctor-dashboard',
+            name: 'doctor-dashboard',
+            component: () => import('../views/DoctorDashboardView.vue'),
+            meta: { requiresAuth: true }
         }
     ],
     scrollBehavior(to, from, savedPosition) {
@@ -82,6 +88,19 @@ const router = createRouter({
         } else {
             return { top: 0, behavior: 'smooth' }
         }
+    }
+})
+
+router.beforeEach((to, from, next) => {
+    const isAuthenticated = localStorage.getItem('doctor_auth') === 'true'
+
+    if (to.meta.requiresAuth && !isAuthenticated) {
+        next('/login')
+    } else if (to.path === '/login' && isAuthenticated) {
+        // If a logged in doctor tries to go to login, send them to dashboard
+        next('/doctor-dashboard')
+    } else {
+        next()
     }
 })
 

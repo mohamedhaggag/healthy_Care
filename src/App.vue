@@ -5,16 +5,18 @@ import FooterSection from './components/FooterSection.vue'
 import { RouterView, useRoute } from 'vue-router'
 
 const route = useRoute()
-const isAuthPage = computed(() => {
-  return route.path === '/login' || route.path === '/signup'
+const isNoNavPage = computed(() => {
+  return route.path === '/login' || 
+         route.path === '/signup' || 
+         route.path === '/doctor-dashboard'
 })
 </script>
 
 <template>
   <div class="min-h-screen bg-white font-sans text-gray-900">
-    <NavBar v-if="!isAuthPage" />
+    <NavBar v-if="!isNoNavPage" />
     <RouterView />
-    <FooterSection v-if="!isAuthPage" />
+    <FooterSection v-if="!isNoNavPage" />
   </div>
 </template>
 

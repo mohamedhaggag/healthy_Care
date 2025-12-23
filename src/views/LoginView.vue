@@ -15,18 +15,23 @@ const isLoading = ref(false)
 const ADMIN_EMAIL = 'Admin@gmail.com'
 const ADMIN_PASSWORD = 'admin'
 
+// Doctor credentials
+const DOCTOR_EMAIL = 'doctor@healthycare.com'
+const DOCTOR_PASSWORD = 'doctor123'
+
 const handleLogin = () => {
   errorMessage.value = ''
   isLoading.value = true
 
   // Simulate API call delay
   setTimeout(() => {
-    // Check admin credentials
+    // Check credentials
     if (email.value === ADMIN_EMAIL && password.value === ADMIN_PASSWORD) {
       login(email.value, password.value, rememberMe.value)
-      // Redirect to home page
-      // Cart and wishlist will be loaded automatically via useCart watcher
       router.push('/')
+    } else if (email.value === DOCTOR_EMAIL && password.value === DOCTOR_PASSWORD) {
+      localStorage.setItem('doctor_auth', 'true')
+      router.push('/doctor-dashboard')
     } else {
       errorMessage.value = 'Invalid email or password. Please try again.'
       isLoading.value = false
