@@ -1,5 +1,35 @@
-# Vue 3 + Vite
+# healthy_Care (Vue 3 + Vite)
 
-This template should help get you started developing with Vue 3 in Vite. The template uses Vue 3 `<script setup>` SFCs, check out the [script setup docs](https://v3.vuejs.org/api/sfc-script-setup.html#sfc-script-setup) to learn more.
+## Environment variables
 
-Learn more about IDE Support for Vue in the [Vue Docs Scaling up Guide](https://vuejs.org/guide/scaling-up/tooling.html#ide-support).
+The OpenAI API key is loaded from a **`.env`** file (project root). Create it by copying `env.example`:
+
+```bash
+cp env.example .env
+```
+
+Then set:
+
+- `OPENAI_API_KEY=...`
+- *(optional)* `OPENAI_MODEL=...`
+- *(optional)* `PORT=3001`
+
+## Run
+
+Install deps:
+
+```bash
+npm install
+```
+
+Start the frontend (Vite):
+
+```bash
+npm run dev
+```
+
+Start the backend API server:
+
+```bash
+node server/index.js
+```

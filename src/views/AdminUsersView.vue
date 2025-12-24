@@ -2,12 +2,12 @@
   <div class="flex h-screen bg-[#f8fcfb]">
     <!-- Admin Sidebar -->
     <aside class="w-64 bg-[#052b1b] text-white flex flex-col transition-all duration-300 animate-slide-in-left">
-      <div class="p-6 flex items-center gap-3">
+      <router-link to="/" class="p-6 flex items-center gap-3 hover:opacity-90 transition-opacity">
         <div class="w-10 h-10 rounded-xl bg-[#00c288] flex items-center justify-center shadow-lg shadow-[#00c288]/20">
           <font-awesome-icon icon="leaf" class="text-white text-xl" />
         </div>
         <span class="font-bold text-xl tracking-tight">HealthyAdmin</span>
-      </div>
+      </router-link>
 
       <nav class="flex-1 px-4 mt-6">
         <div class="space-y-2">
@@ -53,7 +53,7 @@
 
       <!-- Stats Cards -->
       <div class="grid grid-cols-4 gap-6 mb-8">
-        <div v-for="(stat, index) in stats" :key="index" class="bg-white p-6 rounded-3xl shadow-sm border border-gray-50 flex justify-between items-start animate-slide-up" :style="{ animationDelay: `${index * 100}ms` }">
+        <div v-for="(stat, index) in userStats" :key="index" class="bg-white p-6 rounded-3xl shadow-sm border border-gray-50 flex justify-between items-start animate-slide-up" :style="{ animationDelay: `${index * 100}ms` }">
           <div>
             <p class="text-[12px] text-gray-500 font-medium mb-1">{{ stat.label }}</p>
             <h3 class="text-2xl font-bold text-gray-900">{{ stat.value }}</h3>
@@ -155,16 +155,19 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuth } from '../composables/useAuth'
+import { useAdminData } from '../composables/useAdminData'
 
 const router = useRouter()
 const { logout } = useAuth()
+const { getAllUsers, stats } = useAdminData()
 
 const searchQuery = ref('')
 const activeFilter = ref('All')
 const showAddUserModal = ref(false)
+const users = ref([])
 
 const navItems = [
   { label: 'Dashboard', icon: 'th-large', path: '/admin-dashboard' },
@@ -173,25 +176,25 @@ const navItems = [
   { label: 'Products', icon: 'shopping-bag', path: '/admin-products' }
 ]
 
-const stats = [
-  { label: 'Total Users', value: '12,847', trend: '12.5% this month', trendUp: true, icon: 'users', iconColor: 'text-green-500', bgColor: 'bg-green-50' },
-  { label: 'Active Users', value: '9,234', trend: '8.2% this month', trendUp: true, icon: 'user-check', iconColor: 'text-blue-500', bgColor: 'bg-blue-50' },
-  { label: 'New This Week', value: '342', trend: '15.3% vs last week', trendUp: true, icon: 'user-plus', iconColor: 'text-purple-500', bgColor: 'bg-purple-50' },
-  { label: 'Inactive', value: '3,613', trend: '2.1% this month', trendUp: false, icon: 'user-slash', iconColor: 'text-orange-500', bgColor: 'bg-orange-50' }
-]
+// Dynamic stats
+const userStats = computed(() => {
+  const s = stats.value
+  const newThisWeek = users.value.filter(u => {
+    const joined = new Date(u.joined)
+    const weekAgo = new Date()
+    weekAgo.setDate(weekAgo.getDate() - 7)
+    return joined > weekAgo
+  }).length
+  
+  return [
+    { label: 'Total Users', value: s.totalUsers.toString(), trend: `${s.activeUsers} active`, trendUp: true, icon: 'users', iconColor: 'text-green-500', bgColor: 'bg-green-50' },
+    { label: 'Active Users', value: s.activeUsers.toString(), trend: `${Math.round((s.activeUsers / s.totalUsers) * 100) || 0}% active rate`, trendUp: true, icon: 'user-check', iconColor: 'text-blue-500', bgColor: 'bg-blue-50' },
+    { label: 'New This Week', value: newThisWeek.toString(), trend: 'Recent signups', trendUp: true, icon: 'user-plus', iconColor: 'text-purple-500', bgColor: 'bg-purple-50' },
+    { label: 'Inactive', value: (s.totalUsers - s.activeUsers).toString(), trend: 'Not active', trendUp: false, icon: 'user-slash', iconColor: 'text-orange-500', bgColor: 'bg-orange-50' }
+  ]
+})
 
 const filters = ['All', 'Active', 'Inactive', 'New']
-
-const users = ref([
-  { id: 1, name: 'Ahmed Hassan', email: 'ahmed.hassan@email.com', avatar: 'https://randomuser.me/api/portraits/men/32.jpg', goal: 'Weight Loss', status: 'Active', joined: 'Jan 15, 2024' },
-  { id: 2, name: 'Mohamed Ali', email: 'mohamed.ali@email.com', avatar: 'https://randomuser.me/api/portraits/men/44.jpg', goal: 'Weight Gain', status: 'Active', joined: 'Jan 18, 2024' },
-  { id: 3, name: 'Omar Khalil', email: 'omar.khalil@email.com', avatar: 'https://randomuser.me/api/portraits/men/12.jpg', goal: 'Health', status: 'Active', joined: 'Jan 20, 2024' },
-  { id: 4, name: 'Youssef Ibrahim', email: 'youssef.i@email.com', avatar: 'https://randomuser.me/api/portraits/men/55.jpg', goal: 'Weight Loss', status: 'Inactive', joined: 'Jan 22, 2024' },
-  { id: 5, name: 'Karim Mahmoud', email: 'karim.m@email.com', avatar: 'https://randomuser.me/api/portraits/men/21.jpg', goal: 'Weight Gain', status: 'Active', joined: 'Feb 1, 2024' },
-  { id: 6, name: 'Tarek Samir', email: 'tarek.samir@email.com', avatar: 'https://randomuser.me/api/portraits/men/66.jpg', goal: 'Health', status: 'Active', joined: 'Feb 5, 2024' },
-  { id: 7, name: 'Amr Fathy', email: 'amr.fathy@email.com', avatar: 'https://randomuser.me/api/portraits/men/77.jpg', goal: 'Weight Loss', status: 'Active', joined: 'Feb 10, 2024' },
-  { id: 8, name: 'Hossam Adel', email: 'hossam.adel@email.com', avatar: 'https://randomuser.me/api/portraits/men/88.jpg', goal: 'Weight Gain', status: 'Inactive', joined: 'Feb 12, 2024' }
-])
 
 const filteredUsers = computed(() => {
   return users.value.filter(user => {
@@ -200,9 +203,24 @@ const filteredUsers = computed(() => {
     const matchesFilter = activeFilter.value === 'All' || 
                          (activeFilter.value === 'Active' && user.status === 'Active') ||
                          (activeFilter.value === 'Inactive' && user.status === 'Inactive') ||
-                         (activeFilter.value === 'New' && user.joined.includes('Feb'))
+                         (activeFilter.value === 'New' && isNewUser(user))
     return matchesSearch && matchesFilter
   })
+})
+
+const isNewUser = (user) => {
+  const joined = new Date(user.joined)
+  const weekAgo = new Date()
+  weekAgo.setDate(weekAgo.getDate() - 7)
+  return joined > weekAgo
+}
+
+const loadUsers = () => {
+  users.value = getAllUsers()
+}
+
+onMounted(() => {
+  loadUsers()
 })
 
 const handleLogout = () => {

@@ -17,15 +17,20 @@ const handleLogin = () => {
 
   // Simulate API call delay
   setTimeout(() => {
-    const authData = login(email.value, password.value, rememberMe.value)
-    
-    if (authData.isAdmin) {
-      router.push('/admin-dashboard')
-    } else if (authData.isDoctor) {
-      router.push('/doctor-dashboard')
-    } else {
-      // For general users or local registered users
-      router.push('/')
+    try {
+      const authData = login(email.value, password.value, rememberMe.value)
+      
+      if (authData.isAdmin) {
+        router.push('/admin-dashboard')
+      } else if (authData.isDoctor) {
+        router.push('/doctor-dashboard')
+      } else {
+        // For general users or local registered users
+        router.push('/')
+      }
+    } catch (error) {
+      errorMessage.value = error.message || 'Invalid credentials. Please try again.'
+      isLoading.value = false
     }
   }, 500)
 }

@@ -1,4 +1,12 @@
 <script setup>
+import { useRouter } from 'vue-router'
+
+const router = useRouter()
+
+const goContact = () => {
+  // No backend contact page; best "working" CTA is sign up (get started)
+  router.push('/signup')
+}
 </script>
 
 <template>
@@ -15,7 +23,7 @@
         <p class="text-gray-500 mb-8 max-w-2xl mx-auto">
           Join our community today and start your journey towards a healthier, happier you with our expert guidance.
         </p>
-        <button class="bg-green-600 text-white px-8 py-3.5 rounded-full font-bold shadow-lg shadow-green-300 hover:bg-green-700 hover:scale-105 transition-all duration-300">
+        <button @click="goContact" class="bg-green-600 text-white px-8 py-3.5 rounded-full font-bold shadow-lg shadow-green-300 hover:bg-green-700 hover:scale-105 transition-all duration-300">
           Contact Us <font-awesome-icon icon="arrow-right" class="ml-2" />
         </button>
       </div>

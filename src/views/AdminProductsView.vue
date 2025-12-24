@@ -2,12 +2,12 @@
   <div class="flex h-screen bg-[#f8fcfb]">
     <!-- Admin Sidebar -->
     <aside class="w-64 bg-[#052b1b] text-white flex flex-col transition-all duration-300 animate-slide-in-left">
-      <div class="p-6 flex items-center gap-3">
+      <router-link to="/" class="p-6 flex items-center gap-3 hover:opacity-90 transition-opacity">
         <div class="w-10 h-10 rounded-xl bg-[#00c288] flex items-center justify-center shadow-lg shadow-[#00c288]/20">
           <font-awesome-icon icon="leaf" class="text-white text-xl" />
         </div>
         <span class="font-bold text-xl tracking-tight">HealthyAdmin</span>
-      </div>
+      </router-link>
 
       <nav class="flex-1 px-4 mt-6">
         <div class="space-y-2">
@@ -45,7 +45,7 @@
           <h1 class="text-2xl font-bold text-gray-900">Products Management</h1>
           <p class="text-sm text-gray-500 mt-1">Manage all products and inventory</p>
         </div>
-        <button class="px-6 py-3 bg-[#00c288] text-white rounded-xl font-semibold hover:bg-[#00a872] transition-colors shadow-lg shadow-[#00c288]/20 flex items-center gap-2">
+        <button @click="handleAddProduct" class="px-6 py-3 bg-[#00c288] text-white rounded-xl font-semibold hover:bg-[#00a872] transition-colors shadow-lg shadow-[#00c288]/20 flex items-center gap-2">
           <font-awesome-icon icon="plus" />
           Add New Product
         </button>
@@ -53,7 +53,7 @@
 
       <!-- Stats Cards -->
       <div class="grid grid-cols-4 gap-6 mb-8">
-        <div v-for="(stat, index) in stats" :key="index" class="bg-white p-6 rounded-3xl shadow-sm border border-gray-50 flex justify-between items-start animate-slide-up" :style="{ animationDelay: `${index * 100}ms` }">
+        <div v-for="(stat, index) in productStats" :key="index" class="bg-white p-6 rounded-3xl shadow-sm border border-gray-50 flex justify-between items-start animate-slide-up" :style="{ animationDelay: `${index * 100}ms` }">
           <div>
             <p class="text-[12px] text-gray-500 font-medium mb-1">{{ stat.label }}</p>
             <h3 class="text-2xl font-bold text-gray-900">{{ stat.value }}</h3>
@@ -96,9 +96,9 @@
         <div v-for="product in filteredProducts" :key="product.id" 
              class="bg-white rounded-3xl shadow-sm border border-gray-50 overflow-hidden hover:shadow-xl transition-all duration-300 group">
           <div class="relative h-48 overflow-hidden bg-gray-100">
-            <img :src="product.image" :alt="product.name" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300" />
-            <div :class="['absolute top-4 right-4 px-3 py-1 rounded-full text-[10px] font-bold uppercase', product.stock > 20 ? 'bg-green-500 text-white' : product.stock > 0 ? 'bg-orange-500 text-white' : 'bg-red-500 text-white']">
-              {{ product.stock > 0 ? 'In Stock' : 'Out of Stock' }}
+            <img :src="product.images?.[0] || product.image || 'https://images.unsplash.com/photo-1551963831-b3b1ca40c98e?w=400&h=300&fit=crop'" :alt="product.name" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300" />
+            <div :class="['absolute top-4 right-4 px-3 py-1 rounded-full text-[10px] font-bold uppercase', (product.stock || 0) > 20 ? 'bg-green-500 text-white' : (product.stock || 0) > 0 ? 'bg-orange-500 text-white' : 'bg-red-500 text-white']">
+              {{ (product.stock || 0) > 0 ? 'In Stock' : 'Out of Stock' }}
             </div>
             <div v-if="product.discount" class="absolute top-4 left-4 px-3 py-1 bg-red-500 text-white rounded-full text-[10px] font-bold">
               -{{ product.discount }}%
@@ -114,24 +114,24 @@
             <div class="flex items-center justify-between mb-3">
               <div>
                 <p class="text-lg font-bold text-[#00c288]">${{ product.price }}</p>
-                <p v-if="product.originalPrice" class="text-xs text-gray-400 line-through">${{ product.originalPrice }}</p>
+                <p v-if="product.oldPrice" class="text-xs text-gray-400 line-through">${{ product.oldPrice }}</p>
               </div>
               <div class="text-right">
                 <p class="text-xs text-gray-500">Stock</p>
-                <p class="text-sm font-bold text-gray-900">{{ product.stock }}</p>
+                <p class="text-sm font-bold text-gray-900">{{ product.stock || 0 }}</p>
               </div>
             </div>
 
             <div class="flex items-center gap-1 mb-4">
-              <font-awesome-icon v-for="i in 5" :key="i" :icon="i <= product.rating ? 'star' : 'star'" :class="i <= product.rating ? 'text-yellow-500' : 'text-gray-300'" class="text-xs" />
-              <span class="text-xs text-gray-500 ml-1">({{ product.reviews }})</span>
+              <font-awesome-icon v-for="i in 5" :key="i" :icon="i <= Math.round(product.rating || 0) ? 'star' : 'star'" :class="i <= Math.round(product.rating || 0) ? 'text-yellow-500' : 'text-gray-300'" class="text-xs" />
+              <span class="text-xs text-gray-500 ml-1">({{ product.reviews || 0 }})</span>
             </div>
 
             <div class="flex gap-2">
-              <button class="flex-1 py-2 bg-[#00c288] text-white rounded-xl text-xs font-semibold hover:bg-[#00a872] transition-colors">
+              <button @click="handleEdit(product)" class="flex-1 py-2 bg-[#00c288] text-white rounded-xl text-xs font-semibold hover:bg-[#00a872] transition-colors">
                 Edit
               </button>
-              <button class="p-2 border border-gray-200 rounded-xl hover:bg-red-50 transition-colors">
+              <button @click="handleDelete(product.id)" class="p-2 border border-gray-200 rounded-xl hover:bg-red-50 transition-colors">
                 <font-awesome-icon icon="trash" class="text-red-500 text-xs" />
               </button>
             </div>
@@ -139,6 +139,55 @@
         </div>
       </div>
     </main>
+
+    <!-- Add/Edit Product Modal -->
+    <div v-if="showAddModal" class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4" @click.self="showAddModal = false">
+      <div class="bg-white rounded-3xl p-8 max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+        <h2 class="text-2xl font-bold text-gray-900 mb-6">{{ editingProduct?.id ? 'Edit Product' : 'Add New Product' }}</h2>
+        <div class="space-y-4">
+          <div>
+            <label class="block text-sm font-semibold text-gray-700 mb-2">Product Name</label>
+            <input v-model="editingProduct.name" type="text" class="w-full px-4 py-3 bg-gray-50 rounded-xl border-none focus:ring-2 focus:ring-[#00c288]/20 outline-none" placeholder="Enter product name" />
+          </div>
+          <div class="grid grid-cols-2 gap-4">
+            <div>
+              <label class="block text-sm font-semibold text-gray-700 mb-2">Category</label>
+              <input v-model="editingProduct.category" type="text" class="w-full px-4 py-3 bg-gray-50 rounded-xl border-none focus:ring-2 focus:ring-[#00c288]/20 outline-none" placeholder="Category" />
+            </div>
+            <div>
+              <label class="block text-sm font-semibold text-gray-700 mb-2">Price</label>
+              <input v-model.number="editingProduct.price" type="number" step="0.01" class="w-full px-4 py-3 bg-gray-50 rounded-xl border-none focus:ring-2 focus:ring-[#00c288]/20 outline-none" placeholder="0.00" />
+            </div>
+          </div>
+          <div class="grid grid-cols-2 gap-4">
+            <div>
+              <label class="block text-sm font-semibold text-gray-700 mb-2">Stock</label>
+              <input v-model.number="editingProduct.stock" type="number" class="w-full px-4 py-3 bg-gray-50 rounded-xl border-none focus:ring-2 focus:ring-[#00c288]/20 outline-none" placeholder="0" />
+            </div>
+            <div>
+              <label class="block text-sm font-semibold text-gray-700 mb-2">Rating</label>
+              <input v-model.number="editingProduct.rating" type="number" step="0.1" min="0" max="5" class="w-full px-4 py-3 bg-gray-50 rounded-xl border-none focus:ring-2 focus:ring-[#00c288]/20 outline-none" placeholder="5.0" />
+            </div>
+          </div>
+          <div>
+            <label class="block text-sm font-semibold text-gray-700 mb-2">Image URL</label>
+            <input v-model="editingProduct.image" type="text" class="w-full px-4 py-3 bg-gray-50 rounded-xl border-none focus:ring-2 focus:ring-[#00c288]/20 outline-none" placeholder="https://..." />
+          </div>
+          <div>
+            <label class="block text-sm font-semibold text-gray-700 mb-2">Description</label>
+            <textarea v-model="editingProduct.description" rows="3" class="w-full px-4 py-3 bg-gray-50 rounded-xl border-none focus:ring-2 focus:ring-[#00c288]/20 outline-none" placeholder="Product description"></textarea>
+          </div>
+        </div>
+        <div class="flex gap-4 mt-6">
+          <button @click="showAddModal = false" class="flex-1 px-6 py-3 bg-gray-100 text-gray-700 rounded-xl font-semibold hover:bg-gray-200 transition-colors">
+            Cancel
+          </button>
+          <button @click="handleSaveProduct" class="flex-1 px-6 py-3 bg-[#00c288] text-white rounded-xl font-semibold hover:bg-[#00a872] transition-colors">
+            {{ editingProduct?.id ? 'Update' : 'Add' }} Product
+          </button>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -146,12 +195,16 @@
 import { ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuth } from '../composables/useAuth'
+import { useAdminData } from '../composables/useAdminData'
 
 const router = useRouter()
 const { logout } = useAuth()
+const { products, stats, deleteProduct, addProduct, updateProduct } = useAdminData()
 
 const searchQuery = ref('')
 const activeFilter = ref('All')
+const showAddModal = ref(false)
+const editingProduct = ref(null)
 
 const navItems = [
   { label: 'Dashboard', icon: 'th-large', path: '/admin-dashboard' },
@@ -160,25 +213,22 @@ const navItems = [
   { label: 'Products', icon: 'shopping-bag', path: '/admin-products' }
 ]
 
-const stats = [
-  { label: 'Total Products', value: '1,238', trend: '45 new this month', trendUp: true, icon: 'box', iconColor: 'text-blue-500', bgColor: 'bg-blue-50' },
-  { label: 'In Stock', value: '1,089', trend: '88% availability', trendUp: true, icon: 'check-circle', iconColor: 'text-green-500', bgColor: 'bg-green-50' },
-  { label: 'Low Stock', value: '87', trend: 'Need restock', trendUp: false, icon: 'exclamation-triangle', iconColor: 'text-orange-500', bgColor: 'bg-orange-50' },
-  { label: 'Revenue', value: '$48.2K', trend: '23% this month', trendUp: true, icon: 'dollar-sign', iconColor: 'text-purple-500', bgColor: 'bg-purple-50' }
-]
+// Dynamic stats
+const productStats = computed(() => {
+  const s = stats.value
+  return [
+    { label: 'Total Products', value: s.totalProducts.toString(), trend: 'All products', trendUp: true, icon: 'box', iconColor: 'text-blue-500', bgColor: 'bg-blue-50' },
+    { label: 'In Stock', value: s.inStockProducts.toString(), trend: `${Math.round((s.inStockProducts / s.totalProducts) * 100) || 0}% availability`, trendUp: true, icon: 'check-circle', iconColor: 'text-green-500', bgColor: 'bg-green-50' },
+    { label: 'Low Stock', value: s.lowStockProducts.toString(), trend: 'Need restock', trendUp: false, icon: 'exclamation-triangle', iconColor: 'text-orange-500', bgColor: 'bg-orange-50' },
+    { label: 'Revenue', value: `$${(s.monthlyRevenue / 1000).toFixed(1)}K`, trend: `${s.monthlyOrders} orders`, trendUp: true, icon: 'dollar-sign', iconColor: 'text-purple-500', bgColor: 'bg-purple-50' }
+  ]
+})
 
-const filters = ['All', 'Supplements', 'Equipment', 'Nutrition', 'Accessories']
-
-const products = ref([
-  { id: 1, name: 'Organic Whey Protein Powder', category: 'Supplements', price: 49.99, originalPrice: 59.99, discount: 17, stock: 145, rating: 5, reviews: 234, image: 'https://images.unsplash.com/photo-1579722821273-0f6c7d44362f?w=400&h=300&fit=crop' },
-  { id: 2, name: 'Vitamin D3 5000 IU', category: 'Supplements', price: 24.99, stock: 89, rating: 5, reviews: 156, image: 'https://images.unsplash.com/photo-1550572017-4814c5c7e0c4?w=400&h=300&fit=crop' },
-  { id: 3, name: 'Resistance Bands Set', category: 'Equipment', price: 29.99, originalPrice: 39.99, discount: 25, stock: 67, rating: 4, reviews: 98, image: 'https://images.unsplash.com/photo-1598289431512-b97b0917affc?w=400&h=300&fit=crop' },
-  { id: 4, name: 'Yoga Mat Premium', category: 'Equipment', price: 39.99, stock: 123, rating: 5, reviews: 187, image: 'https://images.unsplash.com/photo-1601925260368-ae2f83cf8b7f?w=400&h=300&fit=crop' },
-  { id: 5, name: 'Omega-3 Fish Oil', category: 'Supplements', price: 34.99, stock: 0, rating: 5, reviews: 276, image: 'https://images.unsplash.com/photo-1607619056574-7b8d3ee536b2?w=400&h=300&fit=crop' },
-  { id: 6, name: 'Meal Prep Containers', category: 'Accessories', price: 19.99, stock: 234, rating: 4, reviews: 145, image: 'https://images.unsplash.com/photo-1610832958506-aa56368176cf?w=400&h=300&fit=crop' },
-  { id: 7, name: 'Protein Bars Box (12)', category: 'Nutrition', price: 27.99, originalPrice: 32.99, discount: 15, stock: 178, rating: 4, reviews: 203, image: 'https://images.unsplash.com/photo-1604480132715-bd70f4d3a0b5?w=400&h=300&fit=crop' },
-  { id: 8, name: 'Shaker Bottle', category: 'Accessories', price: 12.99, stock: 15, rating: 5, reviews: 89, image: 'https://images.unsplash.com/photo-1625772452859-1c03d5bf1137?w=400&h=300&fit=crop' }
-])
+// Get unique categories from products
+const filters = computed(() => {
+  const categories = ['All', ...new Set(products.value.map(p => p.category))]
+  return categories
+})
 
 const filteredProducts = computed(() => {
   return products.value.filter(product => {
@@ -188,6 +238,47 @@ const filteredProducts = computed(() => {
     return matchesSearch && matchesFilter
   })
 })
+
+const handleEdit = (product) => {
+  editingProduct.value = { ...product }
+  showAddModal.value = true
+}
+
+const handleDelete = (productId) => {
+  if (confirm('Are you sure you want to delete this product?')) {
+    deleteProduct(productId)
+  }
+}
+
+const handleAddProduct = () => {
+  editingProduct.value = {
+    name: '',
+    category: '',
+    price: 0,
+    stock: 0,
+    rating: 5,
+    image: '',
+    description: '',
+    images: []
+  }
+  showAddModal.value = true
+}
+
+const handleSaveProduct = () => {
+  if (!editingProduct.value.name || !editingProduct.value.category) {
+    alert('Please fill in all required fields')
+    return
+  }
+  
+  if (editingProduct.value.id) {
+    updateProduct(editingProduct.value.id, editingProduct.value)
+  } else {
+    addProduct(editingProduct.value)
+  }
+  
+  showAddModal.value = false
+  editingProduct.value = null
+}
 
 const handleLogout = () => {
     logout()

@@ -1,4 +1,41 @@
 <script setup>
+import { computed, ref } from 'vue'
+
+const testimonials = [
+  {
+    quote:
+      "I struggled with my weight for years until I found Healthy Care. The personalized plans and expert guidance made all the difference. I've lost 30lbs and feel more energetic than ever!",
+    initials: 'TD',
+    name: 'Tom David',
+    rating: 5
+  },
+  {
+    quote:
+      'The meal plans are simple and actually fit my schedule. I finally feel consistent and my digestion improved a lot.',
+    initials: 'SA',
+    name: 'Salma Ahmed',
+    rating: 5
+  },
+  {
+    quote:
+      'The experts helped me build a sustainable routine. No more crash diets — just real habits that work.',
+    initials: 'MK',
+    name: 'Mohamed Karim',
+    rating: 5
+  }
+]
+
+const currentIndex = ref(0)
+
+const current = computed(() => testimonials[currentIndex.value])
+
+const next = () => {
+  currentIndex.value = (currentIndex.value + 1) % testimonials.length
+}
+
+const prev = () => {
+  currentIndex.value = (currentIndex.value - 1 + testimonials.length) % testimonials.length
+}
 </script>
 
 <template>
@@ -19,27 +56,27 @@
             <font-awesome-icon icon="quote-left" class="text-green-200 text-6xl absolute -top-6 -left-4 -z-10" />
             
             <p class="text-lg text-gray-600 italic mb-6 leading-relaxed">
-              "I struggled with my weight for years until I found Healthy Care. The personalized plans and expert guidance made all the difference. I've lost 30lbs and feel more energetic than ever before!"
+              "{{ current.quote }}"
             </p>
             
             <div class="flex items-center gap-4">
                <div class="w-12 h-12 rounded-full bg-green-100 flex items-center justify-center text-green-600 font-bold text-lg">
-                 TD
+                 {{ current.initials }}
                </div>
                <div>
-                 <h4 class="font-bold text-dark">Tom David</h4>
+                 <h4 class="font-bold text-dark">{{ current.name }}</h4>
                  <div class="flex text-yellow-400 text-sm">
-                   <font-awesome-icon icon="star" v-for="i in 5" :key="i" />
+                   <font-awesome-icon icon="star" v-for="i in current.rating" :key="i" />
                  </div>
                </div>
             </div>
           </div>
           
           <div class="mt-8 flex gap-4">
-             <button class="w-10 h-10 rounded-full border border-gray-300 flex items-center justify-center hover:bg-green-50 hover:border-green-500 transition-colors">
+             <button @click="prev" class="w-10 h-10 rounded-full border border-gray-300 flex items-center justify-center hover:bg-green-50 hover:border-green-500 transition-colors">
                <font-awesome-icon icon="arrow-left" class="text-gray-500" />
              </button>
-             <button class="w-10 h-10 rounded-full border border-gray-300 flex items-center justify-center hover:bg-green-50 hover:border-green-500 transition-colors">
+             <button @click="next" class="w-10 h-10 rounded-full border border-gray-300 flex items-center justify-center hover:bg-green-50 hover:border-green-500 transition-colors">
                <font-awesome-icon icon="arrow-right" class="text-gray-500" />
              </button>
              

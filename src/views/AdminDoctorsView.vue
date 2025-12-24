@@ -2,12 +2,12 @@
   <div class="flex h-screen bg-[#f8fcfb]">
     <!-- Admin Sidebar -->
     <aside class="w-64 bg-[#052b1b] text-white flex flex-col transition-all duration-300 animate-slide-in-left">
-      <div class="p-6 flex items-center gap-3">
+      <router-link to="/" class="p-6 flex items-center gap-3 hover:opacity-90 transition-opacity">
         <div class="w-10 h-10 rounded-xl bg-[#00c288] flex items-center justify-center shadow-lg shadow-[#00c288]/20">
           <font-awesome-icon icon="leaf" class="text-white text-xl" />
         </div>
         <span class="font-bold text-xl tracking-tight">HealthyAdmin</span>
-      </div>
+      </router-link>
 
       <nav class="flex-1 px-4 mt-6">
         <div class="space-y-2">
@@ -45,7 +45,7 @@
           <h1 class="text-2xl font-bold text-gray-900">Doctors Management</h1>
           <p class="text-sm text-gray-500 mt-1">Manage all registered doctors and their specializations</p>
         </div>
-        <button class="px-6 py-3 bg-[#00c288] text-white rounded-xl font-semibold hover:bg-[#00a872] transition-colors shadow-lg shadow-[#00c288]/20 flex items-center gap-2">
+        <button @click="handleAddDoctor" class="px-6 py-3 bg-[#00c288] text-white rounded-xl font-semibold hover:bg-[#00a872] transition-colors shadow-lg shadow-[#00c288]/20 flex items-center gap-2">
           <font-awesome-icon icon="user-md" />
           Add New Doctor
         </button>
@@ -53,7 +53,7 @@
 
       <!-- Stats Cards -->
       <div class="grid grid-cols-4 gap-6 mb-8">
-        <div v-for="(stat, index) in stats" :key="index" class="bg-white p-6 rounded-3xl shadow-sm border border-gray-50 flex justify-between items-start animate-slide-up" :style="{ animationDelay: `${index * 100}ms` }">
+        <div v-for="(stat, index) in doctorStats" :key="index" class="bg-white p-6 rounded-3xl shadow-sm border border-gray-50 flex justify-between items-start animate-slide-up" :style="{ animationDelay: `${index * 100}ms` }">
           <div>
             <p class="text-[12px] text-gray-500 font-medium mb-1">{{ stat.label }}</p>
             <h3 class="text-2xl font-bold text-gray-900">{{ stat.value }}</h3>
@@ -124,13 +124,10 @@
             </div>
 
             <div class="flex gap-2">
-              <button class="flex-1 py-2 bg-[#00c288] text-white rounded-xl text-sm font-semibold hover:bg-[#00a872] transition-colors">
-                View Profile
+              <button @click="handleEdit(doctor)" class="flex-1 py-2 bg-[#00c288] text-white rounded-xl text-sm font-semibold hover:bg-[#00a872] transition-colors">
+                Edit
               </button>
-              <button class="p-2 border border-gray-200 rounded-xl hover:bg-gray-50 transition-colors">
-                <font-awesome-icon icon="edit" class="text-gray-600" />
-              </button>
-              <button class="p-2 border border-gray-200 rounded-xl hover:bg-red-50 transition-colors">
+              <button @click="handleDelete(doctor.id)" class="p-2 border border-gray-200 rounded-xl hover:bg-red-50 transition-colors">
                 <font-awesome-icon icon="trash" class="text-red-500" />
               </button>
             </div>
@@ -138,6 +135,84 @@
         </div>
       </div>
     </main>
+
+    <!-- Add/Edit Doctor Modal -->
+    <div v-if="showAddModal" class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4" @click.self="showAddModal = false">
+      <div class="bg-white rounded-3xl p-8 max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+        <h2 class="text-2xl font-bold text-gray-900 mb-6">{{ editingDoctor?.id ? 'Edit Doctor' : 'Add New Doctor' }}</h2>
+        <div class="space-y-4">
+          <div class="grid grid-cols-2 gap-4">
+            <div>
+              <label class="block text-sm font-semibold text-gray-700 mb-2">Doctor Name</label>
+              <input v-model="editingDoctor.name" type="text" class="w-full px-4 py-3 bg-gray-50 rounded-xl border-none focus:ring-2 focus:ring-[#00c288]/20 outline-none" placeholder="Dr. Name" />
+            </div>
+            <div>
+              <label class="block text-sm font-semibold text-gray-700 mb-2">Specialization</label>
+              <input v-model="editingDoctor.specialization" type="text" class="w-full px-4 py-3 bg-gray-50 rounded-xl border-none focus:ring-2 focus:ring-[#00c288]/20 outline-none" placeholder="Specialization" />
+            </div>
+          </div>
+          <div class="grid grid-cols-2 gap-4">
+            <div>
+              <label class="block text-sm font-semibold text-gray-700 mb-2">Email</label>
+              <input v-model="editingDoctor.email" type="email" class="w-full px-4 py-3 bg-gray-50 rounded-xl border-none focus:ring-2 focus:ring-[#00c288]/20 outline-none" placeholder="email@example.com" />
+            </div>
+            <div>
+              <label class="block text-sm font-semibold text-gray-700 mb-2">Phone</label>
+              <input v-model="editingDoctor.phone" type="text" class="w-full px-4 py-3 bg-gray-50 rounded-xl border-none focus:ring-2 focus:ring-[#00c288]/20 outline-none" placeholder="+20 123 456 7890" />
+            </div>
+          </div>
+          <div>
+            <label class="block text-sm font-semibold text-gray-700 mb-2">Doctor Photo</label>
+
+            <div class="flex items-center gap-4">
+              <div class="w-14 h-14 rounded-2xl overflow-hidden border border-gray-100 bg-gray-50 flex items-center justify-center">
+                <img
+                  :src="editingDoctor.avatar || 'https://ui-avatars.com/api/?name=Doctor&background=00c288&color=fff'"
+                  :alt="editingDoctor.name || 'Doctor'"
+                  class="w-full h-full object-cover"
+                />
+              </div>
+
+              <div class="flex-1">
+                <input
+                  type="file"
+                  accept="image/*"
+                  @change="handleAvatarUpload"
+                  class="block w-full text-sm text-gray-600 file:mr-4 file:py-2.5 file:px-4 file:rounded-xl file:border-0 file:text-sm file:font-semibold file:bg-[#00c288]/10 file:text-[#00c288] hover:file:bg-[#00c288]/20"
+                />
+                <p class="text-[11px] text-gray-400 mt-2">
+                  Upload from your PC (recommended). Max 2MB. Saved with the doctor and will appear on the public doctors page.
+                </p>
+              </div>
+            </div>
+
+            <div class="mt-4">
+              <label class="block text-xs font-semibold text-gray-600 mb-2">Or Avatar URL (optional)</label>
+              <input v-model="editingDoctor.avatar" type="text" class="w-full px-4 py-3 bg-gray-50 rounded-xl border-none focus:ring-2 focus:ring-[#00c288]/20 outline-none" placeholder="https://..." />
+            </div>
+          </div>
+          <div>
+            <label class="block text-sm font-semibold text-gray-700 mb-2">Experience</label>
+            <input v-model="editingDoctor.experience" type="text" class="w-full px-4 py-3 bg-gray-50 rounded-xl border-none focus:ring-2 focus:ring-[#00c288]/20 outline-none" placeholder="e.g. 10 years" />
+          </div>
+          <div>
+            <label class="block text-sm font-semibold text-gray-700 mb-2">Status</label>
+            <select v-model="editingDoctor.status" class="w-full px-4 py-3 bg-gray-50 rounded-xl border-none focus:ring-2 focus:ring-[#00c288]/20 outline-none">
+              <option value="Active">Active</option>
+              <option value="Inactive">Inactive</option>
+            </select>
+          </div>
+        </div>
+        <div class="flex gap-4 mt-6">
+          <button @click="showAddModal = false" class="flex-1 px-6 py-3 bg-gray-100 text-gray-700 rounded-xl font-semibold hover:bg-gray-200 transition-colors">
+            Cancel
+          </button>
+          <button @click="handleSaveDoctor" class="flex-1 px-6 py-3 bg-[#00c288] text-white rounded-xl font-semibold hover:bg-[#00a872] transition-colors">
+            {{ editingDoctor?.id ? 'Update' : 'Add' }} Doctor
+          </button>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -145,12 +220,41 @@
 import { ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuth } from '../composables/useAuth'
+import { useAdminData } from '../composables/useAdminData'
 
 const router = useRouter()
 const { logout } = useAuth()
+const { doctors, stats, deleteDoctor, addDoctor, updateDoctor } = useAdminData()
 
 const searchQuery = ref('')
 const activeFilter = ref('All')
+const showAddModal = ref(false)
+const editingDoctor = ref(null)
+
+const handleAvatarUpload = (e) => {
+  const file = e?.target?.files?.[0]
+  if (!file || !editingDoctor.value) return
+
+  // Limit size to avoid localStorage quota issues
+  const maxBytes = 2 * 1024 * 1024
+  if (file.size > maxBytes) {
+    alert('Image is too large. Please choose an image smaller than 2MB.')
+    e.target.value = ''
+    return
+  }
+
+  const reader = new FileReader()
+  reader.onload = () => {
+    editingDoctor.value.avatar = reader.result
+    // clear input so choosing same file again triggers change
+    e.target.value = ''
+  }
+  reader.onerror = () => {
+    alert('Failed to read image. Please try a different file.')
+    e.target.value = ''
+  }
+  reader.readAsDataURL(file)
+}
 
 const navItems = [
   { label: 'Dashboard', icon: 'th-large', path: '/admin-dashboard' },
@@ -159,36 +263,78 @@ const navItems = [
   { label: 'Products', icon: 'shopping-bag', path: '/admin-products' }
 ]
 
-const stats = [
-  { label: 'Total Doctors', value: '284', trend: '12 new this month', trendUp: true, icon: 'user-md', iconColor: 'text-blue-500', bgColor: 'bg-blue-50' },
-  { label: 'Active Doctors', value: '267', trend: '94% active rate', trendUp: true, icon: 'user-check', iconColor: 'text-green-500', bgColor: 'bg-green-50' },
-  { label: 'Specializations', value: '18', trend: '3 categories', trendUp: true, icon: 'stethoscope', iconColor: 'text-purple-500', bgColor: 'bg-purple-50' },
-  { label: 'Avg Rating', value: '4.8', trend: '0.2 pts increase', trendUp: true, icon: 'star', iconColor: 'text-yellow-500', bgColor: 'bg-yellow-50' }
-]
+// Dynamic stats
+const doctorStats = computed(() => {
+  const s = stats.value
+  const specializations = new Set(doctors.value.map(d => d.specialization)).size
+  const avgRating = doctors.value.length > 0 
+    ? (doctors.value.reduce((sum, d) => sum + d.rating, 0) / doctors.value.length).toFixed(1)
+    : '0.0'
+  
+  return [
+    { label: 'Total Doctors', value: s.totalDoctors.toString(), trend: `${s.activeDoctors} active`, trendUp: true, icon: 'user-md', iconColor: 'text-blue-500', bgColor: 'bg-blue-50' },
+    { label: 'Active Doctors', value: s.activeDoctors.toString(), trend: `${Math.round((s.activeDoctors / s.totalDoctors) * 100) || 0}% active rate`, trendUp: true, icon: 'user-check', iconColor: 'text-green-500', bgColor: 'bg-green-50' },
+    { label: 'Specializations', value: specializations.toString(), trend: 'Categories', trendUp: true, icon: 'stethoscope', iconColor: 'text-purple-500', bgColor: 'bg-purple-50' },
+    { label: 'Avg Rating', value: avgRating, trend: 'Overall rating', trendUp: true, icon: 'star', iconColor: 'text-yellow-500', bgColor: 'bg-yellow-50' }
+  ]
+})
 
-const filters = ['All', 'Nutrition', 'Fitness', 'Mental Health', 'General']
-
-const doctors = ref([
-  { id: 1, name: 'Dr. Ahmed Hassan', specialization: 'Nutrition Specialist', avatar: 'https://randomuser.me/api/portraits/men/32.jpg', patients: 145, rating: 4.9, status: 'Active', tags: ['Diet', 'Weight Loss'] },
-  { id: 2, name: 'Dr. Mohamed Ali', specialization: 'Fitness Coach', avatar: 'https://randomuser.me/api/portraits/men/44.jpg', patients: 132, rating: 4.8, status: 'Active', tags: ['Training', 'Cardio'] },
-  { id: 3, name: 'Dr. Omar Khalil', specialization: 'Mental Health', avatar: 'https://randomuser.me/api/portraits/men/12.jpg', patients: 98, rating: 4.7, status: 'Active', tags: ['Therapy', 'Wellness'] },
-  { id: 4, name: 'Dr. Youssef Ibrahim', specialization: 'General Practitioner', avatar: 'https://randomuser.me/api/portraits/men/55.jpg', patients: 210, rating: 4.9, status: 'Active', tags: ['General', 'Checkup'] },
-  { id: 5, name: 'Dr. Karim Mahmoud', specialization: 'Sports Medicine', avatar: 'https://randomuser.me/api/portraits/men/21.jpg', patients: 87, rating: 4.6, status: 'Inactive', tags: ['Sports', 'Injury'] },
-  { id: 6, name: 'Dr. Tarek Samir', specialization: 'Nutrition Specialist', avatar: 'https://randomuser.me/api/portraits/men/66.jpg', patients: 156, rating: 4.8, status: 'Active', tags: ['Nutrition', 'Meal Plans'] },
-  { id: 7, name: 'Dr. Amr Fathy', specialization: 'Cardiology', avatar: 'https://randomuser.me/api/portraits/men/77.jpg', patients: 178, rating: 4.9, status: 'Active', tags: ['Heart', 'Cardio'] },
-  { id: 8, name: 'Dr. Hossam Adel', specialization: 'Physiotherapy', avatar: 'https://randomuser.me/api/portraits/men/88.jpg', patients: 92, rating: 4.7, status: 'Active', tags: ['Rehab', 'Therapy'] },
-  { id: 9, name: 'Dr. Samy El-Sawy', specialization: 'Fitness Coach', avatar: 'https://randomuser.me/api/portraits/men/99.jpg', patients: 124, rating: 4.8, status: 'Active', tags: ['Fitness', 'Strength'] }
-])
+// Get unique specializations
+const filters = computed(() => {
+  const specs = ['All', ...new Set(doctors.value.map(d => d.specialization))]
+  return specs
+})
 
 const filteredDoctors = computed(() => {
   return doctors.value.filter(doctor => {
     const matchesSearch = doctor.name.toLowerCase().includes(searchQuery.value.toLowerCase()) ||
                          doctor.specialization.toLowerCase().includes(searchQuery.value.toLowerCase())
     const matchesFilter = activeFilter.value === 'All' || 
-                         doctor.specialization.toLowerCase().includes(activeFilter.value.toLowerCase())
+                         doctor.specialization === activeFilter.value
     return matchesSearch && matchesFilter
   })
 })
+
+const handleEdit = (doctor) => {
+  editingDoctor.value = { ...doctor }
+  showAddModal.value = true
+}
+
+const handleDelete = (doctorId) => {
+  if (confirm('Are you sure you want to delete this doctor?')) {
+    deleteDoctor(doctorId)
+  }
+}
+
+const handleAddDoctor = () => {
+  editingDoctor.value = {
+    name: '',
+    specialization: '',
+    avatar: 'https://ui-avatars.com/api/?name=Doctor&background=00c288&color=fff',
+    email: '',
+    phone: '',
+    experience: '',
+    status: 'Active',
+    tags: []
+  }
+  showAddModal.value = true
+}
+
+const handleSaveDoctor = () => {
+  if (!editingDoctor.value.name || !editingDoctor.value.specialization) {
+    alert('Please fill in all required fields')
+    return
+  }
+  
+  if (editingDoctor.value.id) {
+    updateDoctor(editingDoctor.value.id, editingDoctor.value)
+  } else {
+    addDoctor(editingDoctor.value)
+  }
+  
+  showAddModal.value = false
+  editingDoctor.value = null
+}
 
 const handleLogout = () => {
     logout()

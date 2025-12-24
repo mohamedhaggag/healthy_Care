@@ -1,4 +1,8 @@
 <script setup>
+import { useRouter } from 'vue-router'
+
+const router = useRouter()
+
 const goals = [
   {
     title: 'Weight Loss',
@@ -25,6 +29,10 @@ const goals = [
     btnClass: 'border-green-600 text-green-600 hover:bg-green-600 hover:text-white'
   }
 ]
+
+const viewGoalPlan = (goalTitle) => {
+  router.push({ path: '/plan', query: { goal: goalTitle } })
+}
 </script>
 
 <template>
@@ -47,7 +55,7 @@ const goals = [
           <h3 class="text-2xl font-bold text-dark mb-4">{{ goal.title }}</h3>
           <p class="text-gray-500 mb-8 leading-relaxed">{{ goal.description }}</p>
           
-          <button :class="`px-8 py-3 rounded-full font-medium border transition-all duration-300 w-full md:w-auto ${goal.btnClass}`">
+          <button @click="viewGoalPlan(goal.title)" :class="`px-8 py-3 rounded-full font-medium border transition-all duration-300 w-full md:w-auto ${goal.btnClass}`">
             View Plan <font-awesome-icon icon="arrow-right" class="ml-2 text-sm" />
           </button>
         </div>

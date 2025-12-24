@@ -15,6 +15,7 @@ const links = [
   { name: 'Plan', path: '/plan' },
   { name: 'Shop', path: '/shop' },
   { name: 'Blog', path: '/blogs' },
+  { name: 'AI Chat', path: '/ai-chat' },
 ]
 
 onMounted(() => {
@@ -41,12 +42,12 @@ const handleLogout = () => {
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div class="flex justify-between h-20 items-center">
         <!-- Logo -->
-        <div class="flex-shrink-0 flex items-center gap-2 cursor-pointer">
+        <RouterLink to="/" class="flex-shrink-0 flex items-center gap-2">
           <div class="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary">
             <font-awesome-icon icon="leaf" />
           </div>
           <span class="font-bold text-xl text-dark tracking-tight">HealthyCare</span>
-        </div>
+        </RouterLink>
 
         <!-- Desktop Menu -->
         <div class="hidden md:flex items-center space-x-8">
@@ -162,10 +163,15 @@ const handleLogout = () => {
     <!-- Mobile Menu -->
     <div v-show="isMenuOpen" class="md:hidden bg-white border-b border-gray-100">
       <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3">
-        <a v-for="link in links" :key="link.name" :href="link.href"
-           class="block px-3 py-2 text-base font-medium text-gray-700 hover:text-primary hover:bg-green-50 rounded-md">
+        <RouterLink
+          v-for="link in links"
+          :key="link.name"
+          :to="link.path"
+          class="block px-3 py-2 text-base font-medium text-gray-700 hover:text-primary hover:bg-green-50 rounded-md"
+          @click="isMenuOpen = false"
+        >
           {{ link.name }}
-        </a>
+        </RouterLink>
         <div v-if="isAuthenticated" class="mt-4 flex flex-col gap-2 px-3">
           <RouterLink to="/profile" class="w-full py-2 text-gray-700 font-medium rounded-lg hover:bg-green-50 text-center">
             My Profile

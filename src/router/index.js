@@ -36,9 +36,24 @@ const router = createRouter({
             component: () => import('../views/DoctorProfileView.vue')
         },
         {
+            path: '/experts',
+            name: 'experts',
+            component: () => import('../views/ExpertsView.vue')
+        },
+        {
+            path: '/ai-chat',
+            name: 'ai-chat',
+            component: () => import('../views/AiChatView.vue')
+        },
+        {
             path: '/login',
             name: 'login',
             component: () => import('../views/LoginView.vue')
+        },
+        {
+            path: '/forgot-password',
+            name: 'forgot-password',
+            component: () => import('../views/ForgotPasswordView.vue')
         },
         {
             path: '/signup',

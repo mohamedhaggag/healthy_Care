@@ -1,4 +1,8 @@
 <script setup>
+import { useRouter } from 'vue-router'
+
+const router = useRouter()
+
 const plans = [
   {
     name: 'Free',
@@ -22,6 +26,10 @@ const plans = [
     activeFeatures: 6 // All active
   }
 ]
+
+const choosePlan = (planName) => {
+  router.push({ path: '/plan', query: { plan: planName } })
+}
 </script>
 
 <template>
@@ -60,7 +68,7 @@ const plans = [
             </li>
           </ul>
 
-          <button :class="`w-full py-3 rounded-full font-bold transition-all duration-300 ${plan.recommended ? 'bg-green-600 text-white hover:bg-green-700 shadow-lg shadow-green-200' : 'border border-green-600 text-green-600 hover:bg-green-50'}`">
+          <button @click="choosePlan(plan.name)" :class="`w-full py-3 rounded-full font-bold transition-all duration-300 ${plan.recommended ? 'bg-green-600 text-white hover:bg-green-700 shadow-lg shadow-green-200' : 'border border-green-600 text-green-600 hover:bg-green-50'}`">
             Choose Plan
           </button>
         </div>

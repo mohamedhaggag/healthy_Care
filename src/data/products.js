@@ -272,12 +272,35 @@ export const products = [
   }
 ]
 
+// Get products from admin data if available, otherwise use default
+export const getProducts = () => {
+  if (typeof window !== 'undefined') {
+    const adminProducts = localStorage.getItem('adminProducts')
+    if (adminProducts) {
+      try {
+        const parsed = JSON.parse(adminProducts)
+        // Map admin products to match the expected format
+        return parsed.map(p => ({
+          ...p,
+          inStock: (p.stock || 0) > 0,
+          images: p.images || [p.image || 'https://images.unsplash.com/photo-1551963831-b3b1ca40c98e?w=600&h=600&fit=crop']
+        }))
+      } catch (e) {
+        console.error('Error parsing admin products:', e)
+      }
+    }
+  }
+  return products
+}
+
 export const getProductById = (id) => {
-  return products.find(product => product.id === parseInt(id))
+  const allProducts = getProducts()
+  return allProducts.find(product => product.id === parseInt(id))
 }
 
 export const getRelatedProducts = (currentProductId, limit = 4) => {
-  return products
+  const allProducts = getProducts()
+  return allProducts
     .filter(product => product.id !== parseInt(currentProductId))
     .slice(0, limit)
 }

@@ -1,34 +1,33 @@
 <script setup>
-const experts = [
-  {
-    name: 'Dr. James Dow',
-    role: 'Nutrition Specialist',
-    image: 'https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?q=80&w=2070&auto=format&fit=crop',
-    tags: ['Diet', 'Health']
-  },
-  {
-    name: 'Dr. Samy El-Sawy',
-    role: 'Fitness & Recovery',
-    image: 'https://images.unsplash.com/photo-1622253692010-333f2da6031d?q=80&w=2070&auto=format&fit=crop',
-    tags: ['Rehab', 'Strength']
-  },
-  {
-    name: 'Dr. Adam Chen',
-    role: 'Holistic Health',
-    image: 'https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?q=80&w=2070&auto=format&fit=crop',
-    tags: ['Mental', 'Yoga']
-  },
-  {
-    name: 'Dr. Karim Hassan',
-    role: 'Sports Medicine',
-    image: 'https://images.unsplash.com/photo-1622253692010-333f2da6031d?q=80&w=2070&auto=format&fit=crop',
-    tags: ['Sports', 'Recovery']
-  }
-]
+import { computed } from 'vue'
+import { useRouter } from 'vue-router'
+import { useAdminData } from '../composables/useAdminData'
+
+const router = useRouter()
+const { doctors } = useAdminData()
+
+// Show up to 4 doctors on home section, dynamic from admin data
+const experts = computed(() => {
+  return (doctors.value || []).slice(0, 4).map(d => ({
+    id: d.id,
+    name: d.name,
+    role: d.specialization,
+    image: d.avatar || 'https://ui-avatars.com/api/?name=Doctor&background=00c288&color=fff',
+    tags: d.tags || []
+  }))
+})
+
+const goToExpert = (id) => {
+  router.push(`/experts/${id}`)
+}
+
+const goToAll = () => {
+  router.push('/experts')
+}
 </script>
 
 <template>
-  <section class="py-20 bg-[#fffdf8]">
+  <section id="experts" class="py-20 bg-[#fffdf8]">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div class="text-center mb-16">
         <h3 class="text-green-500 font-semibold mb-2 uppercase tracking-wide">Experts</h3>
@@ -41,10 +40,10 @@ const experts = [
       </div>
 
       <div class="grid md:grid-cols-4 gap-8">
-        <div v-for="(expert, index) in experts" :key="expert.name" 
+        <div v-for="(expert, index) in experts" :key="expert.id || expert.name" 
              class="bg-white rounded-3xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 group border border-gray-100 hover:-translate-y-2"
              data-aos="fade-up" :data-aos-delay="index * 100">
-          <div class="relative overflow-hidden h-96 cursor-pointer" @click="$router.push('/experts/dr-ahmed')">
+          <div class="relative overflow-hidden h-96 cursor-pointer" @click="goToExpert(expert.id)">
             <div class="absolute inset-0 bg-green-500/0 group-hover:bg-green-500/10 transition-colors z-10 transition-all duration-300"></div>
             <img :src="expert.image" :alt="expert.name" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
             
@@ -66,8 +65,8 @@ const experts = [
         </div>
       </div>
       
-       <div class="text-center mt-12">
-        <button class="bg-green-600 text-white px-8 py-3 rounded-full hover:bg-green-700 shadow-lg shadow-green-200 transition-all duration-300">
+      <div class="text-center mt-12">
+        <button @click="goToAll" class="bg-green-600 text-white px-8 py-3 rounded-full hover:bg-green-700 shadow-lg shadow-green-200 transition-all duration-300">
            See All Experts
         </button>
       </div>

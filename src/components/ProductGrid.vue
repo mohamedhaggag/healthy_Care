@@ -1,7 +1,7 @@
 <script setup>
 import { ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
-import { products } from '../data/products'
+import { getProducts } from '../data/products'
 import { useCart } from '../composables/useCart'
 
 const props = defineProps({
@@ -15,6 +15,7 @@ const { addToCart, addToWishlist, removeFromWishlist, isInWishlist } = useCart()
 
 const sortBy = ref('latest')
 const displayProducts = computed(() => {
+  const products = getProducts()
   const arr = [...products]
   // Sorting
   switch (sortBy.value) {
