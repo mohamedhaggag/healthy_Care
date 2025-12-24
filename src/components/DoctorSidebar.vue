@@ -35,6 +35,15 @@
         <span>Message</span>
       </router-link>
 
+      <router-link 
+        to="/doctor-blogs" 
+        class="flex items-center gap-4 px-4 py-3 rounded-xl font-medium transition-all duration-300"
+        :class="[route.path.startsWith('/doctor-blogs') ? 'bg-white text-[#0a4d8c]' : 'text-white/70 hover:bg-white/10']"
+      >
+        <font-awesome-icon icon="file-alt" width="20" />
+        <span>Blogs</span>
+      </router-link>
+
     </nav>
 
     <div class="absolute bottom-4 left-0 w-full px-4">

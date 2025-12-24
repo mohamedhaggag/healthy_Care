@@ -50,7 +50,7 @@ const articles = [
       <!-- Featured Article / Custom Layout -->
       <div class="grid lg:grid-cols-2 gap-8 mb-16 items-center" data-aos="fade-up">
         <div class="rounded-3xl overflow-hidden shadow-lg h-96 relative group">
-            <img src="https://images.unsplash.com/photo-1623341214825-9f4f963727d5?q=80&w=2072&auto=format&fit=crop" alt="Fiber Rich Food" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+            <img src="https://images.unsplash.com/photo-1498837167922-ddd27525d352?q=80&w=2070&auto=format&fit=crop" alt="Fiber Rich Food" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
             <div class="absolute inset-0 bg-dark/20 group-hover:bg-dark/10 transition-colors"></div>
         </div>
         <div class="lg:pl-8">
