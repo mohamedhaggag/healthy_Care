@@ -1,10 +1,43 @@
 <script setup>
+import { ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { products } from '../data/products'
 import { useCart } from '../composables/useCart'
 
+const props = defineProps({
+  priceRange: { type: Number, default: 100 },
+  rating: { type: Number, default: 0 },
+  category: { type: String, default: '' }
+})
+
 const router = useRouter()
 const { addToCart, addToWishlist, removeFromWishlist, isInWishlist } = useCart()
+
+const sortBy = ref('latest')
+const displayProducts = computed(() => {
+  const arr = [...products]
+  // Sorting
+  switch (sortBy.value) {
+    case 'price-asc':
+      arr.sort((a, b) => a.price - b.price)
+      break
+    case 'price-desc':
+      arr.sort((a, b) => b.price - a.price)
+      break
+    case 'latest':
+    default:
+      arr.sort((a, b) => b.id - a.id)
+  }
+
+  // Filtering by price, rating, category
+  return arr.filter(p => {
+    const withinPrice = p.price <= props.priceRange
+    const meetsRating = !props.rating || (p.rating || 0) >= props.rating
+    const cat = props.category ? props.category.toLowerCase().split(/\s+/).filter(Boolean) : []
+    const meetsCategory = !cat.length || cat.some(w => (p.category || '').toLowerCase().includes(w))
+    return withinPrice && meetsRating && meetsCategory
+  })
+})
 
 const goToProduct = (productId) => {
   router.push(`/product/${productId}`)
@@ -30,13 +63,13 @@ const handleToggleWishlist = (product, event) => {
   <div>
     <!-- Header -->
     <div class="flex flex-col sm:flex-row justify-between items-center mb-6">
-      <p class="text-gray-500 text-sm mb-4 sm:mb-0"><span class="font-bold text-dark">52</span> Results Found</p>
+      <p class="text-gray-500 text-sm mb-4 sm:mb-0"><span class="font-bold text-dark">{{ displayProducts.length }}</span> Results Found</p>
       <div class="flex items-center gap-2">
          <span class="text-sm text-gray-500">Sort by:</span>
-         <select class="bg-white border border-gray-200 text-sm rounded-lg px-3 py-2 cursor-pointer outline-none focus:border-green-500">
-           <option>Latest</option>
-           <option>Price: Low to High</option>
-           <option>Price: High to Low</option>
+         <select v-model="sortBy" class="bg-white border border-gray-200 text-sm rounded-lg px-3 py-2 cursor-pointer outline-none focus:border-green-500">
+           <option value="latest">Latest</option>
+           <option value="price-asc">Price: Low to High</option>
+           <option value="price-desc">Price: High to Low</option>
          </select>
       </div>
     </div>
@@ -44,7 +77,7 @@ const handleToggleWishlist = (product, event) => {
     <!-- Grid -->
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
        <div 
-         v-for="(product, index) in products" 
+         v-for="(product, index) in displayProducts" 
          :key="product.id" 
          class="group bg-white rounded-2xl p-4 border border-gray-100 hover:shadow-xl hover:border-green-100 transition-all duration-300 relative cursor-pointer"
          data-aos="fade-up" 

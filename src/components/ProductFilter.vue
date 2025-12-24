@@ -1,18 +1,37 @@
 <script setup>
-import { ref } from 'vue'
+import { ref, watch, toRef } from 'vue'
+
+const props = defineProps({
+  priceRange: { type: Number, default: 100 },
+  rating: { type: Number, default: 0 },
+  category: { type: String, default: '' }
+})
+const emit = defineEmits(['update:priceRange', 'update:rating', 'update:category'])
 
 const categories = [
-  { name: 'Fresh Fruit', count: 25, active: false },
-  { name: 'Vegetables', count: 150, active: true },
-  { name: 'Meat', count: 18, active: false },
-  { name: 'Snacks', count: 47, active: false },
-  { name: 'Beverages', count: 10, active: false },
-  { name: 'Beauty & Health', count: 17, active: false },
-  { name: 'Bread & Bakery', count: 13, active: false },
+  { name: 'Fresh Fruit', count: 25 },
+  { name: 'Vegetables', count: 150 },
+  { name: 'Meat', count: 18 },
+  { name: 'Snacks', count: 47 },
+  { name: 'Beverages', count: 10 },
+  { name: 'Beauty & Health', count: 17 },
+  { name: 'Bread & Bakery', count: 13 },
 ]
 
 const ratings = [5, 4, 3, 2, 1]
-const priceRange = ref(50)
+
+const localPriceRange = ref(props.priceRange)
+const localRating = ref(props.rating)
+const localCategory = ref(props.category)
+
+// Keep local state and emit updates to parent
+watch(() => props.priceRange, (v) => localPriceRange.value = v)
+watch(() => props.rating, (v) => localRating.value = v)
+watch(() => props.category, (v) => localCategory.value = v)
+
+watch(localPriceRange, (v) => emit('update:priceRange', v))
+watch(localRating, (v) => emit('update:rating', v))
+watch(localCategory, (v) => emit('update:category', v))
 </script>
 
 <template>
@@ -26,16 +45,16 @@ const priceRange = ref(50)
 
     <!-- Categories -->
     <div>
-      <div class="flex items-center justify-between mb-4 cursor-pointer">
-        <h3 class="font-bold text-lg text-dark">All Categories</h3>
+      <div @click="localCategory = ''" class="flex items-center justify-between mb-4 cursor-pointer">
+        <h3 :class="['font-bold text-lg', localCategory === '' ? 'text-green-600' : 'text-dark']">All Categories</h3>
         <font-awesome-icon icon="chevron-up" class="text-xs text-gray-400" />
       </div>
       <ul class="space-y-3">
-        <li v-for="cat in categories" :key="cat.name" class="flex items-center gap-3 text-gray-600 hover:text-green-600 cursor-pointer group">
-          <div :class="`w-4 h-4 rounded border flex items-center justify-center transition-colors ${cat.active ? 'bg-green-600 border-green-600' : 'border-gray-300 group-hover:border-green-400'}`">
-             <font-awesome-icon v-if="cat.active" icon="check" class="text-white text-[10px]" />
+        <li v-for="cat in categories" :key="cat.name" @click="localCategory = (localCategory === cat.name ? '' : cat.name)" class="flex items-center gap-3 text-gray-600 cursor-pointer group">
+          <div :class="`w-4 h-4 rounded border flex items-center justify-center transition-colors ${localCategory === cat.name ? 'bg-green-600 border-green-600' : 'border-gray-300 group-hover:border-green-400'}`">
+             <font-awesome-icon v-if="localCategory === cat.name" icon="check" class="text-white text-[10px]" />
           </div>
-          <span :class="{'font-medium text-green-600': cat.active}">{{ cat.name }}</span>
+          <span :class="{'font-medium text-green-600': localCategory === cat.name}">{{ cat.name }}</span>
           <span class="text-xs text-gray-400 ml-auto">({{ cat.count }})</span>
         </li>
       </ul>
@@ -47,9 +66,9 @@ const priceRange = ref(50)
         <h3 class="font-bold text-lg text-dark">Price</h3>
         <font-awesome-icon icon="chevron-up" class="text-xs text-gray-400" />
       </div>
-      <input type="range" v-model="priceRange" min="0" max="100" class="w-full h-1 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-green-600">
+      <input type="range" v-model="localPriceRange" min="0" max="100" class="w-full h-1 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-green-600">
       <div class="mt-2 text-sm text-gray-500 font-medium">
-        From: <span class="text-dark font-bold">$0 - ${{ priceRange }}</span>
+        From: <span class="text-dark font-bold">$0 - ${{ localPriceRange }}</span>
       </div>
     </div>
     
@@ -60,8 +79,8 @@ const priceRange = ref(50)
         <font-awesome-icon icon="chevron-up" class="text-xs text-gray-400" />
       </div>
       <ul class="space-y-2">
-        <li v-for="stars in ratings" :key="stars" class="flex items-center gap-2 cursor-pointer group">
-           <div class="w-4 h-4 rounded border border-gray-300 flex items-center justify-center group-hover:border-green-400"></div>
+        <li v-for="stars in ratings" :key="stars" @click="localRating = (localRating === stars ? 0 : stars)" class="flex items-center gap-2 cursor-pointer group">
+           <div :class="['w-4 h-4 rounded border flex items-center justify-center', localRating === stars ? 'bg-green-600 border-green-600' : 'border-gray-300 group-hover:border-green-400']"></div>
            <div class="flex text-yellow-400 text-xs">
              <font-awesome-icon v-for="n in 5" :key="n" :icon="n <= stars ? 'star' : ['far', 'star']" />
            </div>

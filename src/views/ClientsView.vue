@@ -38,6 +38,9 @@
             class="w-full pl-12 pr-4 py-3 bg-slate-50 border-none rounded-xl focus:ring-2 focus:ring-[#0a4d8c]/20 outline-none text-sm transition-all"
           />
         </div>
+        <div class="ml-2 text-xs text-slate-400">
+          Query: <strong class="text-slate-700">{{ searchQuery }}</strong> · Results: <strong class="text-slate-700">{{ filteredClients.length }}</strong>
+        </div>
         <div class="flex items-center gap-2">
           <button v-for="filter in filters" :key="filter"
                   @click="activeFilter = filter"
@@ -65,7 +68,7 @@
             </tr>
           </thead>
           <transition-group name="list" tag="tbody">
-            <tr v-for="client in filteredClients" :key="client.id" class="group border-b border-slate-50 last:border-0 hover:bg-slate-50/50 transition-colors duration-300">
+            <tr v-for="client in paginatedClients" :key="client.id" class="group border-b border-slate-50 last:border-0 hover:bg-slate-50/50 transition-colors duration-300">
               <td class="px-8 py-6">
                 <div class="flex items-center gap-4">
                   <img :src="client.avatar" class="w-10 h-10 rounded-full border-2 border-white shadow-sm" alt="Avatar" />
@@ -122,13 +125,29 @@
             </tr>
           </transition-group>
         </table>
+        <!-- Pagination -->
+        <div class="px-6 py-4 flex items-center justify-between border-t border-slate-100 bg-white">
+          <div class="text-sm text-slate-500">Showing <strong class="text-slate-700">{{ startItem }}</strong> - <strong class="text-slate-700">{{ endItem }}</strong> of <strong class="text-slate-700">{{ filteredClients.length }}</strong></div>
+          <div class="flex items-center gap-2">
+            <button @click="prevPage" :disabled="page === 1" class="px-3 py-2 rounded-md bg-slate-50 text-slate-600 hover:bg-slate-100 disabled:opacity-50">Prev</button>
+            <div class="hidden sm:flex items-center gap-2">
+              <button v-for="p in pagesArray" :key="p" @click="page = p" :class="['px-3 py-2 rounded-md text-sm', page === p ? 'bg-[#0a4d8c] text-white' : 'bg-slate-50 text-slate-600 hover:bg-slate-100']">{{ p }}</button>
+            </div>
+            <button @click="nextPage" :disabled="page === totalPages" class="px-3 py-2 rounded-md bg-slate-50 text-slate-600 hover:bg-slate-100 disabled:opacity-50">Next</button>
+            <select v-model="perPage" class="ml-4 px-3 py-2 rounded-md bg-slate-50 text-slate-600 border border-slate-100 text-sm">
+              <option :value="5">5 / page</option>
+              <option :value="10">10 / page</option>
+              <option :value="20">20 / page</option>
+            </select>
+          </div>
+        </div>
       </div>
     </main>
   </div>
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, watch } from 'vue'
 import DoctorSidebar from '../components/DoctorSidebar.vue'
 
 const searchQuery = ref('')
@@ -156,12 +175,36 @@ const clients = ref([
 ])
 
 const filteredClients = computed(() => {
+  const q = searchQuery.value.trim().toLowerCase()
   return clients.value.filter(client => {
-    const matchesSearch = client.name.toLowerCase().includes(searchQuery.value.toLowerCase())
     const matchesFilter = activeFilter.value === 'All' || client.goal === activeFilter.value
+    if (!q) return matchesFilter
+
+    const name = (client.name || '').toLowerCase()
+    const goal = (client.goal || '').toLowerCase()
+    const weight = String(client.weight || '')
+
+    const matchesSearch = name.includes(q) || goal.includes(q) || weight.includes(q)
     return matchesSearch && matchesFilter
   })
 })
+
+// Pagination state & helpers
+const page = ref(1)
+const perPage = ref(5)
+const totalPages = computed(() => Math.max(1, Math.ceil(filteredClients.value.length / perPage.value)))
+const pagesArray = computed(() => Array.from({ length: totalPages.value }, (_, i) => i + 1))
+const paginatedClients = computed(() => {
+  const start = (page.value - 1) * perPage.value
+  return filteredClients.value.slice(start, start + perPage.value)
+})
+const startItem = computed(() => filteredClients.value.length ? (page.value - 1) * perPage.value + 1 : 0)
+const endItem = computed(() => Math.min(filteredClients.value.length, page.value * perPage.value))
+const prevPage = () => { if (page.value > 1) page.value-- }
+const nextPage = () => { if (page.value < totalPages.value) page.value++ }
+
+// Reset to first page whenever filter/search changes
+watch([searchQuery, activeFilter, clients], () => { page.value = 1 })
 </script>
 
 <style scoped>

@@ -111,12 +111,12 @@
               </div>
               <h2 class="font-bold text-slate-800">Exercise Schedule</h2>
             </div>
-            <button class="p-2 text-slate-300 hover:text-slate-600 transition-colors">
+            <button @click="isEditExerciseOpen = true" class="p-2 text-slate-300 hover:text-slate-600 transition-colors">
               <font-awesome-icon icon="edit" />
             </button>
           </div>
           <div class="space-y-4">
-            <div v-for="(exercise, index) in exercises" :key="index" 
+            <div v-for="(exercise, index) in exercisesRef" :key="index" 
                  class="flex justify-between items-center p-4 rounded-2xl transition-all duration-300 hover:shadow-md"
                  :style="{ backgroundColor: exercise.bgColor }">
               <div>
@@ -167,7 +167,7 @@
             </div>
             <h2 class="font-bold text-slate-800">Doctor's Notes & Recommendations</h2>
           </div>
-          <button class="flex items-center gap-2 px-4 py-2 bg-[#0a4d8c] text-white rounded-xl text-xs font-bold shadow-md hover:bg-[#083d70] transition-all">
+          <button @click="isAddNoteOpen = true" class="flex items-center gap-2 px-4 py-2 bg-[#0a4d8c] text-white rounded-xl text-xs font-bold shadow-md hover:bg-[#083d70] transition-all">
             <font-awesome-icon icon="plus" class="text-[10px]" />
             Add Note
           </button>
@@ -191,6 +191,19 @@
       @close="isEditModalOpen = false"
       @save="handleSaveMealPlan"
     />
+
+    <EditExerciseModal
+      :is-open="isEditExerciseOpen"
+      :exercises="exercisesRef"
+      @close="isEditExerciseOpen = false"
+      @save="handleSaveExercises"
+    />
+
+    <AddNoteModal
+      :is-open="isAddNoteOpen"
+      @close="isAddNoteOpen = false"
+      @save="handleSaveNote"
+    />
   </div>
 </template>
 
@@ -198,6 +211,8 @@
 import { ref, computed } from 'vue'
 import DoctorSidebar from '../components/DoctorSidebar.vue'
 import EditMealPlanModal from '../components/EditMealPlanModal.vue'
+import EditExerciseModal from '../components/EditExerciseModal.vue'
+import AddNoteModal from '../components/AddNoteModal.vue'
 
 const isEditModalOpen = ref(false)
 
@@ -230,7 +245,8 @@ const handleSaveMealPlan = (updatedMeals) => {
   isEditModalOpen.value = false
 }
 
-const exercises = [
+// Exercises should be reactive so edits persist
+const exercisesRef = ref([
   { name: 'Cardio', benefit: 'benefit: warm your body', duration: '45 min', bgColor: '#fff1f2' },
   { name: 'Squat', benefit: 'benefit: warm your body', duration: '10 * 3', bgColor: '#fef2f2' },
   { name: 'Cardio', benefit: 'benefit: warm your body', duration: '45 min', bgColor: '#fff1f2' },
@@ -238,7 +254,22 @@ const exercises = [
   { name: 'Cardio', benefit: 'benefit: warm your body', duration: '45 min', bgColor: '#fff1f2' },
   { name: 'walk', benefit: 'Active Recovery', duration: '30 min', bgColor: '#f0fdf4' },
   { name: 'Squat', benefit: 'benefit: warm your body', duration: '10 * 3', bgColor: '#fefce8' }
-]
+])
+
+const isEditExerciseOpen = ref(false)
+const handleSaveExercises = (updated) => {
+  exercisesRef.value = updated
+  isEditExerciseOpen.value = false
+}
+
+// Add Note modal state & save handler
+const isAddNoteOpen = ref(false)
+const handleSaveNote = (content) => {
+  const date = new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
+  notes.value.unshift({ date, content })
+  isAddNoteOpen.value = false
+}
+
 
 const weeklyChart = [
   { day: 'Sun', height: 60, active: false },
@@ -250,11 +281,11 @@ const weeklyChart = [
   { day: 'Sat', height: 65, active: false }
 ]
 
-const notes = [
+const notes = ref([
   { date: 'Dec 20, 2024', content: 'Client showing excellent progress. Weight loss is steady and healthy. Compliance with meal plan is good. Recommended increasing water intake to 3L per day.' },
   { date: 'Dec 13, 2024', content: 'Client reported feeling more energetic. Sleep quality has improved. Suggested adding more protein to breakfast for better satiety.' },
   { date: 'Dec 6, 2024', content: 'Initial consultation completed. Client is motivated and committed to the weight loss plan. Starting weight: 92kg. Target: 75kg.' }
-]
+])
 </script>
 
 <style scoped>

@@ -1,5 +1,5 @@
 <template>
-  <aside class="w-64 bg-[#0a4d8c] text-white flex flex-col py-8 px-4 h-full fixed left-0 top-0">
+  <aside class="w-64 bg-[#0a4d8c] text-white flex flex-col py-8 px-4 h-screen fixed left-0 top-0">
     <div class="flex items-center gap-3 px-4 mb-16">
       <div class="w-10 h-10 bg-white rounded-full flex items-center justify-center">
         <font-awesome-icon icon="leaf" class="text-[#0a4d8c] text-xl" />
@@ -35,14 +35,17 @@
         <span>Message</span>
       </router-link>
 
+    </nav>
+
+    <div class="absolute bottom-4 left-0 w-full px-4">
       <button 
         @click="handleLogout"
-        class="flex items-center gap-4 px-4 py-3 text-red-300 hover:bg-red-500/10 rounded-xl transition-all duration-300 mt-auto w-full text-left"
+        class="flex items-center gap-4 px-4 py-3 text-red-300 hover:bg-red-500/10 rounded-xl transition-all duration-300 w-full text-left"
       >
         <font-awesome-icon icon="sign-out-alt" width="20" />
         <span>Logout</span>
       </button>
-    </nav>
+    </div>
   </aside>
 </template>
 
