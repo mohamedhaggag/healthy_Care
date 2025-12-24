@@ -12,7 +12,7 @@ if (typeof window !== 'undefined') {
     isAuthenticated.value = authData.isAuthenticated || false
     user.value = authData
   }
-  
+
   // Load registered users
   const savedUsers = localStorage.getItem('registeredUsers')
   if (savedUsers) {
@@ -21,23 +21,30 @@ if (typeof window !== 'undefined') {
 }
 
 export function useAuth() {
-  const login = (email, password, rememberMe = false) => {
+  const login = (identifier, password, rememberMe = false) => {
+    const isLocalAdmin = identifier.toLowerCase() === 'admin' && password === 'admin123';
+    const isDoctor = identifier.toLowerCase() === 'doctor@healthycare.com' && password === 'doctor123';
+
     const authData = {
-      email: email,
-      isAdmin: email === 'Admin@gmail.com',
+      email: identifier.includes('@') ? identifier : `${identifier}@healthyadmin.com`,
+      username: identifier,
+      isAdmin: isLocalAdmin,
+      isDoctor: isDoctor,
       isAuthenticated: true,
       loginTime: new Date().toISOString(),
-      name: email.split('@')[0] // Simple name extraction
+      name: identifier.split('@')[0]
     }
-    
+
     user.value = authData
     isAuthenticated.value = true
-    
+
     if (rememberMe) {
       localStorage.setItem('auth', JSON.stringify(authData))
     } else {
       sessionStorage.setItem('auth', JSON.stringify(authData))
     }
+
+    return authData;
   }
 
   const checkEmailExists = (email) => {
@@ -55,7 +62,7 @@ export function useAuth() {
     if (checkEmailExists(userData.email)) {
       throw new Error('An account with this email already exists. Please use a different email or log in.')
     }
-    
+
     const authData = {
       email: userData.email,
       firstName: userData.firstName,
@@ -77,22 +84,22 @@ export function useAuth() {
         chronicDisease: userData.chronicDisease || ''
       }
     }
-    
+
     // Add to registered users
     registeredUsers.value.push({
       email: userData.email,
       firstName: userData.firstName,
       lastName: userData.lastName
     })
-    
+
     // Save registered users to localStorage
     if (typeof window !== 'undefined') {
       localStorage.setItem('registeredUsers', JSON.stringify(registeredUsers.value))
     }
-    
+
     user.value = authData
     isAuthenticated.value = true
-    
+
     if (rememberMe) {
       localStorage.setItem('auth', JSON.stringify(authData))
     } else {
@@ -105,7 +112,7 @@ export function useAuth() {
     user.value = null
     localStorage.removeItem('auth')
     sessionStorage.removeItem('auth')
-    
+
     // Clear cart and wishlist when logging out
     // This will be handled by useCart watching the auth state
   }

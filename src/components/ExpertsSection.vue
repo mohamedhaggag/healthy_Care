@@ -3,19 +3,19 @@ const experts = [
   {
     name: 'Dr. James Dow',
     role: 'Nutrition Specialist',
-    image: 'https://placehold.co/400x500/eefbf2/0ca84d?text=Dr+James',
+    image: 'https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?q=80&w=2070&auto=format&fit=crop',
     tags: ['Diet', 'Health']
   },
   {
-    name: 'Dr. James Doe',
-    role: 'Fitness Coach',
-    image: 'https://placehold.co/400x500/eefbf2/0ca84d?text=Dr+Doe',
-    tags: ['Workout', 'Strength']
+    name: 'Dr. Samy El-Sawy',
+    role: 'Fitness & Recovery',
+    image: 'https://images.unsplash.com/photo-1559839734-2b71f1536783?q=80&w=2070&auto=format&fit=crop',
+    tags: ['Rehab', 'Strength']
   },
   {
     name: 'Dr. Adam Chen',
     role: 'Holistic Health',
-    image: 'https://placehold.co/400x500/eefbf2/0ca84d?text=Dr+Adam',
+    image: 'https://images.unsplash.com/photo-1594824476967-48c8b964273f?q=80&w=2000&auto=format&fit=crop',
     tags: ['Mental', 'Yoga']
   },
 ]

@@ -11,30 +11,21 @@ const rememberMe = ref(false)
 const errorMessage = ref('')
 const isLoading = ref(false)
 
-// Admin credentials
-const ADMIN_EMAIL = 'Admin@gmail.com'
-const ADMIN_PASSWORD = 'admin'
-
-// Doctor credentials
-const DOCTOR_EMAIL = 'doctor@healthycare.com'
-const DOCTOR_PASSWORD = 'doctor123'
-
 const handleLogin = () => {
   errorMessage.value = ''
   isLoading.value = true
 
   // Simulate API call delay
   setTimeout(() => {
-    // Check credentials
-    if (email.value === ADMIN_EMAIL && password.value === ADMIN_PASSWORD) {
-      login(email.value, password.value, rememberMe.value)
-      router.push('/')
-    } else if (email.value === DOCTOR_EMAIL && password.value === DOCTOR_PASSWORD) {
-      localStorage.setItem('doctor_auth', 'true')
+    const authData = login(email.value, password.value, rememberMe.value)
+    
+    if (authData.isAdmin) {
+      router.push('/admin-dashboard')
+    } else if (authData.isDoctor) {
       router.push('/doctor-dashboard')
     } else {
-      errorMessage.value = 'Invalid email or password. Please try again.'
-      isLoading.value = false
+      // For general users or local registered users
+      router.push('/')
     }
   }, 500)
 }
@@ -77,15 +68,15 @@ const handleLogin = () => {
 
               <!-- Email Field -->
               <div>
-                <label for="email" class="block text-sm font-medium text-gray-700 mb-2">Email</label>
+                <label for="email" class="block text-sm font-medium text-gray-700 mb-2">Email or Username</label>
                 <input
                   id="email"
                   v-model="email"
-                  type="email"
+                  type="text"
                   required
                   :disabled="isLoading"
                   class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all disabled:bg-gray-100 disabled:cursor-not-allowed"
-                  placeholder="Enter your email"
+                  placeholder="Enter your email or username"
                 />
               </div>
 

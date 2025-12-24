@@ -98,6 +98,30 @@ const router = createRouter({
             name: 'doctor-messages',
             component: () => import('../views/MessagesView.vue'),
             meta: { requiresAuth: true }
+        },
+        {
+            path: '/admin-dashboard',
+            name: 'admin-dashboard',
+            component: () => import('../views/AdminDashboardView.vue'),
+            meta: { requiresAdmin: true }
+        },
+        {
+            path: '/admin-users',
+            name: 'admin-users',
+            component: () => import('../views/AdminUsersView.vue'),
+            meta: { requiresAdmin: true }
+        },
+        {
+            path: '/admin-doctors',
+            name: 'admin-doctors',
+            component: () => import('../views/AdminDoctorsView.vue'),
+            meta: { requiresAdmin: true }
+        },
+        {
+            path: '/admin-products',
+            name: 'admin-products',
+            component: () => import('../views/AdminProductsView.vue'),
+            meta: { requiresAdmin: true }
         }
     ],
     scrollBehavior(to, from, savedPosition) {
@@ -110,13 +134,16 @@ const router = createRouter({
 })
 
 router.beforeEach((to, from, next) => {
-    const isAuthenticated = localStorage.getItem('doctor_auth') === 'true'
+    const authData = JSON.parse(localStorage.getItem('auth') || sessionStorage.getItem('auth') || 'null')
+    const isDoctor = authData?.isDoctor || localStorage.getItem('doctor_auth') === 'true'
+    const isAdmin = authData?.isAdmin === true
 
-    if (to.meta.requiresAuth && !isAuthenticated) {
+    if (to.meta.requiresAdmin && !isAdmin) {
         next('/login')
-    } else if (to.path === '/login' && isAuthenticated) {
-        // If a logged in doctor tries to go to login, send them to dashboard
-        next('/doctor-dashboard')
+    } else if (to.meta.requiresAuth && !isDoctor && !isAdmin) {
+        next('/login')
+    } else if (to.path === '/login' && (isDoctor || isAdmin)) {
+        next(isAdmin ? '/admin-dashboard' : '/doctor-dashboard')
     } else {
         next()
     }

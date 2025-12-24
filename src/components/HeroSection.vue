@@ -55,12 +55,23 @@
              <!-- Blob background effect -->
             <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[120%] h-[120%] bg-gradient-to-tr from-green-200/40 to-yellow-100/40 rounded-full blur-3xl -z-10"></div>
             
-            <img src="https://placehold.co/800x600/eefbf2/0ca84d?text=Healthy+Food+Banner" 
-                 alt="Healthy Food Flat Lay" 
-                 class="w-full h-auto rounded-3xl shadow-2xl hover:scale-[1.02] transition-transform duration-500 object-cover" />
+            <img src="https://images.unsplash.com/photo-1490645935967-10de6ba17061?q=80&w=2000&auto=format&fit=crop" 
+                 alt="Healthy Lifestyle & Nutrition" 
+                 class="w-full h-[600px] rounded-3xl shadow-2xl hover:scale-[1.02] transition-transform duration-500 object-cover" />
                  
+            <!-- Floating Badge: Healthy Choice -->
+            <div class="absolute -top-6 -right-6 bg-white p-4 rounded-2xl shadow-xl flex items-center gap-3 animate-bounce-slow" style="animation-delay: 1.5s;" data-aos="zoom-in" data-aos-delay="700">
+               <div class="w-12 h-12 rounded-xl overflow-hidden shadow-inner">
+                 <img src="https://images.unsplash.com/photo-1546069901-ba9599a7e63c?q=80&w=200&auto=format&fit=crop" alt="Healthy Food" class="w-full h-full object-cover">
+               </div>
+               <div>
+                  <p class="text-xs text-gray-500 font-semibold">Healthy Choice</p>
+                  <p class="text-sm font-bold text-green-500">100% Organic</p>
+               </div>
+            </div>
+
              <!-- Floating Badge -->
-            <div class="absolute bottom-10 left-0 bg-white p-4 rounded-2xl shadow-xl flex items-center gap-3 animate-bounce-slow" data-aos="zoom-in" data-aos-delay="500">
+            <div class="absolute bottom-10 -left-10 bg-white p-4 rounded-2xl shadow-xl flex items-center gap-3 animate-bounce-slow" data-aos="zoom-in" data-aos-delay="500">
                <div class="w-10 h-10 rounded-full bg-red-100 text-red-500 flex items-center justify-center">
                  <font-awesome-icon icon="heart" />
                </div>

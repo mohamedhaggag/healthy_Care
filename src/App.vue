@@ -8,7 +8,8 @@ const route = useRoute()
 const isNoNavPage = computed(() => {
   return route.path === '/login' || 
          route.path === '/signup' || 
-         route.path.startsWith('/doctor-')
+         route.path.startsWith('/doctor-') ||
+         route.path.startsWith('/admin-')
 })
 </script>
 
