@@ -9,15 +9,21 @@ const experts = [
   {
     name: 'Dr. Samy El-Sawy',
     role: 'Fitness & Recovery',
-    image: 'https://images.unsplash.com/photo-1559839734-2b71f1536783?q=80&w=2070&auto=format&fit=crop',
+    image: 'https://images.unsplash.com/photo-1622253692010-333f2da6031d?q=80&w=2070&auto=format&fit=crop',
     tags: ['Rehab', 'Strength']
   },
   {
     name: 'Dr. Adam Chen',
     role: 'Holistic Health',
-    image: 'https://images.unsplash.com/photo-1594824476967-48c8b964273f?q=80&w=2000&auto=format&fit=crop',
+    image: 'https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?q=80&w=2070&auto=format&fit=crop',
     tags: ['Mental', 'Yoga']
   },
+  {
+    name: 'Dr. Karim Hassan',
+    role: 'Sports Medicine',
+    image: 'https://images.unsplash.com/photo-1622253692010-333f2da6031d?q=80&w=2070&auto=format&fit=crop',
+    tags: ['Sports', 'Recovery']
+  }
 ]
 </script>
 
@@ -34,7 +40,7 @@ const experts = [
         </p>
       </div>
 
-      <div class="grid md:grid-cols-3 gap-8">
+      <div class="grid md:grid-cols-4 gap-8">
         <div v-for="(expert, index) in experts" :key="expert.name" 
              class="bg-white rounded-3xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 group border border-gray-100 hover:-translate-y-2"
              data-aos="fade-up" :data-aos-delay="index * 100">
