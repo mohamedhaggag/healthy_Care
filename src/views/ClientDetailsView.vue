@@ -12,7 +12,7 @@
       </router-link>
 
       <!-- Client Profile Header -->
-      <div class="bg-white rounded-[40px] p-8 shadow-sm border border-slate-100 mb-8 animate-slide-up">
+      <div v-if="client" class="bg-white rounded-[40px] p-8 shadow-sm border border-slate-100 mb-8 animate-slide-up">
         <div class="flex flex-wrap items-center justify-between gap-6">
           <div class="flex items-center gap-6">
             <div class="relative">
@@ -45,7 +45,7 @@
             </div>
           </div>
           <div class="flex gap-3">
-            <router-link to="/doctor-messages" class="flex items-center gap-2 px-6 py-3 bg-[#0a4d8c] text-white rounded-2xl text-sm font-bold shadow-lg hover:bg-[#083d70] transition-all active:scale-95">
+            <router-link :to="`/doctor-messages?client=${clientId}`" class="flex items-center gap-2 px-6 py-3 bg-[#0a4d8c] text-white rounded-2xl text-sm font-bold shadow-lg hover:bg-[#083d70] transition-all active:scale-95">
               <font-awesome-icon icon="comment" />
               Chat
             </router-link>
@@ -72,7 +72,7 @@
       </div>
 
       <!-- Plan Sections -->
-      <div class="grid grid-cols-2 gap-8 mb-8">
+      <div v-if="client" class="grid grid-cols-2 gap-8 mb-8">
         <!-- Meal Plan -->
         <div class="bg-white rounded-[40px] p-8 shadow-sm border border-slate-100 animate-slide-up delay-200">
           <div class="flex justify-between items-center mb-8">
@@ -208,25 +208,34 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { computed, ref, watch } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
 import DoctorSidebar from '../components/DoctorSidebar.vue'
 import EditMealPlanModal from '../components/EditMealPlanModal.vue'
 import EditExerciseModal from '../components/EditExerciseModal.vue'
 import AddNoteModal from '../components/AddNoteModal.vue'
+import { useAuth } from '../composables/useAuth'
+import { buildDoctorClients, getCurrentDoctor } from '../services/doctorPortal'
 
 const isEditModalOpen = ref(false)
 
-const client = ref({
-  id: 1,
-  name: 'mohamed Nasef',
-  avatar: 'https://randomuser.me/api/portraits/men/32.jpg',
-  goal: 'Weight Loss',
-  age: 32,
-  height: 175,
-  currentWeight: 84,
-  targetWeight: 75,
-  progress: 65
-})
+const route = useRoute()
+const router = useRouter()
+const { user } = useAuth()
+
+const doctor = computed(() => getCurrentDoctor(user.value))
+const clients = computed(() => buildDoctorClients(doctor.value))
+
+const clientId = computed(() => String(route.params.id || ''))
+const client = computed(() => clients.value.find(c => c.id === clientId.value) || null)
+
+watch(
+  client,
+  (c) => {
+    if (!c) router.push('/doctor-clients')
+  },
+  { immediate: true }
+)
 
 const mealPlan = ref([
   { name: 'Breakfast', time: '7:00 AM', calories: 350, description: 'Oatmeal with berries, Greek yogurt' },

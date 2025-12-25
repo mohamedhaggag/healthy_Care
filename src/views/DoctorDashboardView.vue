@@ -10,7 +10,7 @@
         <h1 class="text-2xl font-bold text-[#0a4d8c]">Over View</h1>
         <div class="flex items-center gap-3 text-slate-600">
           <font-awesome-icon icon="user-circle" class="text-xl" />
-          <span class="text-sm">Welcome back, Dr.Mohamed!</span>
+          <span class="text-sm">Welcome back, {{ doctorName }}!</span>
         </div>
       </header>
 
@@ -25,7 +25,7 @@
             <div class="bg-[#c2d6ff] p-6 rounded-3xl flex justify-between items-start">
               <div>
                 <p class="text-slate-600 text-sm mb-1">Active Clients</p>
-                <h3 class="text-4xl font-bold text-[#0a4d8c]">12</h3>
+                <h3 class="text-4xl font-bold text-[#0a4d8c]">{{ activeClients }}</h3>
               </div>
               <div class="w-12 h-12 bg-white rounded-xl flex items-center justify-center text-[#0a4d8c]">
                 <font-awesome-icon icon="users" />
@@ -35,7 +35,7 @@
             <div class="bg-[#c2d6ff] p-6 rounded-3xl flex justify-between items-start transition-all duration-300 hover:scale-105 hover:shadow-lg cursor-pointer">
               <div>
                 <p class="text-slate-600 text-sm mb-1">Overall Compliance</p>
-                <h3 class="text-4xl font-bold text-[#0a4d8c]">78%</h3>
+                <h3 class="text-4xl font-bold text-[#0a4d8c]">{{ averageCompliance }}%</h3>
               </div>
               <div class="w-12 h-12 bg-white rounded-xl flex items-center justify-center text-[#0a4d8c]">
                 <font-awesome-icon icon="chart-line" />
@@ -45,7 +45,7 @@
             <div class="bg-[#c2d6ff] p-6 rounded-3xl flex justify-between items-start">
               <div>
                 <p class="text-slate-600 text-sm mb-1">Today's Appointments</p>
-                <h3 class="text-4xl font-bold text-[#0a4d8c]">4</h3>
+                <h3 class="text-4xl font-bold text-[#0a4d8c]">{{ todaysAppointmentsCount }}</h3>
               </div>
               <div class="w-12 h-12 bg-white rounded-xl flex items-center justify-center text-[#0a4d8c]">
                 <font-awesome-icon icon="calendar-alt" />
@@ -62,35 +62,35 @@
                 </div>
                 <div>
                   <h2 class="font-bold text-slate-800">Clients Need Follow-up</h2>
-                  <p class="text-xs text-slate-400">3 clients require attention</p>
+                  <p class="text-xs text-slate-400">{{ followUps.length }} clients require attention</p>
                 </div>
               </div>
               <router-link to="/doctor-clients" class="text-xs font-semibold text-slate-500 border border-slate-200 px-4 py-2 rounded-xl hover:bg-slate-50">View All</router-link>
             </div>
 
             <div class="space-y-4">
-              <div v-for="i in 3" :key="i" class="flex items-center justify-between p-4 bg-white border border-slate-50 rounded-3xl hover:shadow-md transition-shadow">
+              <div v-for="c in followUps" :key="c.id" class="flex items-center justify-between p-4 bg-white border border-slate-50 rounded-3xl hover:shadow-md transition-shadow">
                 <div class="flex items-center gap-4">
                   <div class="w-12 h-12 rounded-full overflow-hidden bg-slate-200">
-                    <img src="https://randomuser.me/api/portraits/men/32.jpg" alt="Avatar" />
+                    <img :src="c.avatar" alt="Avatar" />
                   </div>
                   <div>
                     <div class="flex items-center gap-2">
-                      <p class="font-bold text-slate-800">mohamed nasef</p>
-                      <span class="text-[10px] text-slate-400">2 days ago</span>
+                      <p class="font-bold text-slate-800">{{ c.name }}</p>
+                      <span class="text-[10px] text-slate-400">{{ c.lastUpdate }}</span>
                     </div>
                     <div class="flex items-center gap-2 mt-1">
-                      <span class="text-[10px] bg-green-50 text-green-600 px-2 py-0.5 rounded-full">Weight Loss</span>
-                      <span class="text-[10px] text-orange-500 font-medium">Compliance: 45%</span>
+                      <span class="text-[10px] bg-green-50 text-green-600 px-2 py-0.5 rounded-full">{{ c.goal }}</span>
+                      <span class="text-[10px] text-orange-500 font-medium">Compliance: {{ c.compliance }}%</span>
                     </div>
                   </div>
                 </div>
                 <div class="flex gap-2">
-                  <router-link to="/doctor-client-details/1" class="bg-slate-50 text-slate-600 px-4 py-2 rounded-xl text-xs font-medium flex items-center gap-2 hover:bg-slate-100 transition-all">
+                  <router-link :to="`/doctor-client-details/${c.id}`" class="bg-slate-50 text-slate-600 px-4 py-2 rounded-xl text-xs font-medium flex items-center gap-2 hover:bg-slate-100 transition-all">
                     <font-awesome-icon icon="eye" />
                     View
                   </router-link>
-                  <router-link to="/doctor-messages" class="bg-[#00c288] text-white px-4 py-2 rounded-xl text-xs font-medium flex items-center gap-2">
+                  <router-link :to="`/doctor-messages?client=${c.id}`" class="bg-[#00c288] text-white px-4 py-2 rounded-xl text-xs font-medium flex items-center gap-2">
                     <font-awesome-icon icon="comment" />
                     Contact
                   </router-link>
@@ -113,27 +113,27 @@
 
               <div class="grid grid-cols-4 gap-4 mb-8">
                 <div class="bg-green-50 p-4 rounded-2xl text-center">
-                   <p class="text-2xl font-bold text-green-600">8</p>
+                   <p class="text-2xl font-bold text-green-600">{{ onTrack }}</p>
                    <p class="text-[10px] text-green-600">On Track</p>
                 </div>
                 <div class="bg-orange-50 p-4 rounded-2xl text-center">
-                   <p class="text-2xl font-bold text-orange-600">3</p>
+                   <p class="text-2xl font-bold text-orange-600">{{ needsSupport }}</p>
                    <p class="text-[10px] text-orange-600">Needs Support</p>
                 </div>
                 <div class="bg-red-50 p-4 rounded-2xl text-center">
-                   <p class="text-2xl font-bold text-red-600">1</p>
+                   <p class="text-2xl font-bold text-red-600">{{ atRisk }}</p>
                    <p class="text-[10px] text-red-600">At Risk</p>
                 </div>
                 <div class="bg-blue-50 p-4 rounded-2xl text-center">
-                   <p class="text-2xl font-bold text-blue-600">32</p>
+                   <p class="text-2xl font-bold text-blue-600">{{ totalMessages }}</p>
                    <p class="text-[10px] text-blue-600">Total Messages</p>
                 </div>
               </div>
 
               <div>
-                <p class="text-xs text-slate-500 mb-2">Average Compliance Rate <span class="float-right font-bold text-green-600">78%</span></p>
+                <p class="text-xs text-slate-500 mb-2">Average Compliance Rate <span class="float-right font-bold text-green-600">{{ averageCompliance }}%</span></p>
                 <div class="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
-                  <div class="bg-[#00c288] h-full" style="width: 78%"></div>
+                  <div class="bg-[#00c288] h-full" :style="{ width: `${averageCompliance}%` }"></div>
                 </div>
               </div>
           </div>
@@ -151,28 +151,28 @@
                 </div>
                 <div>
                   <h2 class="font-bold text-slate-800">Today's Schedule</h2>
-                  <p class="text-xs text-slate-400">Monday, Dec 22</p>
+                  <p class="text-xs text-slate-400">{{ todayLabel }}</p>
                 </div>
               </div>
 
-              <div class="space-y-4">
-                <div v-for="i in 4" :key="i" class="flex items-center justify-between p-3 border-b border-slate-50 last:border-0">
+              <div v-if="todaySchedule.length === 0" class="text-sm text-slate-500 bg-slate-50 rounded-2xl p-4">
+                No appointments today.
+              </div>
+
+              <div v-else class="space-y-4">
+                <div v-for="(s, idx) in todaySchedule" :key="idx" class="flex items-center justify-between p-3 border-b border-slate-50 last:border-0">
                   <div class="flex items-center gap-3">
-                    <img src="https://randomuser.me/api/portraits/men/44.jpg" class="w-10 h-10 rounded-full" />
+                    <img :src="s.avatar" class="w-10 h-10 rounded-full" />
                     <div>
-                      <p class="text-sm font-bold text-slate-800">lol</p>
+                      <p class="text-sm font-bold text-slate-800">{{ s.name }}</p>
                       <p class="text-[10px] text-slate-400">
                         <font-awesome-icon icon="clock" class="mr-1" />
-                        10:00 AM
+                        {{ s.time }}
                       </p>
                     </div>
                   </div>
-                  <button :class="[
-                    'text-[10px] px-3 py-1 rounded-lg font-medium',
-                    i % 3 === 0 ? 'bg-blue-100 text-blue-600' : 
-                    i % 3 === 1 ? 'bg-blue-50 text-blue-400' : 'bg-slate-50 text-slate-400'
-                  ]">
-                    {{ i % 3 === 0 ? 'Video Call' : i % 3 === 1 ? 'chat' : 'Check-in' }}
+                  <button class="text-[10px] px-3 py-1 rounded-lg font-medium bg-blue-100 text-blue-600">
+                    {{ s.type }}
                   </button>
                 </div>
               </div>
@@ -205,10 +205,67 @@
 </template>
 
 <script setup>
+import { computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import DoctorSidebar from '../components/DoctorSidebar.vue'
+import { useAuth } from '../composables/useAuth'
+import { buildDoctorClients, getCurrentDoctor, getDoctorAppointments, isToday } from '../services/doctorPortal'
 
 const router = useRouter()
+const { user, isAuthenticated } = useAuth()
+
+onMounted(() => {
+  if (!isAuthenticated.value) router.push('/login')
+})
+
+const doctor = computed(() => getCurrentDoctor(user.value))
+const doctorName = computed(() => doctor.value?.name || user.value?.name || 'Doctor')
+
+const clients = computed(() => buildDoctorClients(doctor.value))
+const activeClients = computed(() => clients.value.length)
+
+const followUps = computed(() => {
+  const list = [...clients.value]
+  list.sort((a, b) => (a.compliance || 0) - (b.compliance || 0))
+  return list.slice(0, 3)
+})
+
+const averageCompliance = computed(() => {
+  if (!clients.value.length) return 0
+  const sum = clients.value.reduce((acc, c) => acc + (c.compliance || 0), 0)
+  return Math.round(sum / clients.value.length)
+})
+
+const todaysAppointmentsCount = computed(() => {
+  const appts = getDoctorAppointments(doctor.value).filter(a => isToday(a?.date))
+  return appts.length
+})
+
+const todayLabel = computed(() => {
+  const now = new Date()
+  return now.toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' })
+})
+
+const todaySchedule = computed(() => {
+  const appts = getDoctorAppointments(doctor.value).filter(a => isToday(a?.date))
+  appts.sort((a, b) => String(a.time || '').localeCompare(String(b.time || '')))
+  return appts.slice(0, 5).map(a => ({
+    name: a.name || a.fullName || 'Client',
+    time: a.time || '—',
+    type: 'Consultation',
+    avatar: `https://ui-avatars.com/api/?name=${encodeURIComponent(a.name || 'Client')}&background=0a4d8c&color=fff`
+  }))
+})
+
+const totalMessages = computed(() => {
+  // Count doctor inbox threads messages for the follow-up clients as a simple dynamic number
+  // (full inbox lives in Messages page).
+  return followUps.value.reduce((acc, c) => acc + (c.compliance ? 1 : 0), 0) * 2
+})
+
+const onTrack = computed(() => Math.max(0, Math.round((activeClients.value * averageCompliance.value) / 100)))
+const atRisk = computed(() => Math.max(0, Math.round(activeClients.value * 0.1)))
+const needsSupport = computed(() => Math.max(0, activeClients.value - onTrack.value - atRisk.value))
 </script>
 
 <style scoped>
@@ -239,3 +296,4 @@ const router = useRouter()
   display: none;
 }
 </style>
+

@@ -1,38 +1,27 @@
 <script setup>
-import { useRouter } from 'vue-router'
-
-const router = useRouter()
-
 const goals = [
   {
     title: 'Weight Loss',
     description: 'We can manage your weight loss journey with our diet plan.',
     icon: 'weight-scale',
     color: 'text-red-400',
-    bg: 'bg-red-50',
-    btnClass: 'border-green-600 text-green-600 hover:bg-green-600 hover:text-white'
+    bg: 'bg-red-50'
   },
   {
     title: 'Weight Gain',
     description: 'We can manage your weight gain journey with our diet plan.',
     icon: 'dumbbell',
     color: 'text-green-500',
-    bg: 'bg-green-50',
-    btnClass: 'bg-green-600 text-white hover:bg-green-700 shadow-lg shadow-green-200'
+    bg: 'bg-green-50'
   },
   {
     title: 'Health Maintain',
     description: 'We can manage your health maintenance with our diet plan.',
     icon: 'heart-pulse',
     color: 'text-blue-400',
-    bg: 'bg-blue-50',
-    btnClass: 'border-green-600 text-green-600 hover:bg-green-600 hover:text-white'
+    bg: 'bg-blue-50'
   }
 ]
-
-const viewGoalPlan = (goalTitle) => {
-  router.push({ path: '/plan', query: { goal: goalTitle } })
-}
 </script>
 
 <template>
@@ -54,10 +43,6 @@ const viewGoalPlan = (goalTitle) => {
           
           <h3 class="text-2xl font-bold text-dark mb-4">{{ goal.title }}</h3>
           <p class="text-gray-500 mb-8 leading-relaxed">{{ goal.description }}</p>
-          
-          <button @click="viewGoalPlan(goal.title)" :class="`px-8 py-3 rounded-full font-medium border transition-all duration-300 w-full md:w-auto ${goal.btnClass}`">
-            View Plan <font-awesome-icon icon="arrow-right" class="ml-2 text-sm" />
-          </button>
         </div>
       </div>
     </div>

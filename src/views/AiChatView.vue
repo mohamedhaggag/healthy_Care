@@ -10,6 +10,15 @@ const error = ref('')
 const messages = ref([])
 
 const containerRef = ref(null)
+const inputRef = ref(null)
+
+const quickQuestions = [
+  'What are the benefits of eating a balanced diet?',
+  'Which foods are rich in vitamins and minerals?',
+  'How much water should I drink daily for good health?',
+  'What are some healthy snack options?',
+  'How can I reduce sugar intake in my diet?'
+]
 
 const canSend = computed(() => input.value.trim().length > 0 && !isSending.value)
 
@@ -91,6 +100,13 @@ const send = async () => {
     isSending.value = false
   }
 }
+
+const useQuickQuestion = async (q) => {
+  if (isSending.value) return
+  input.value = q
+  await nextTick()
+  inputRef.value?.focus?.()
+}
 </script>
 
 <template>
@@ -158,12 +174,25 @@ const send = async () => {
               {{ error }}
             </div>
 
+            <div class="mb-3 flex flex-wrap gap-2">
+              <button
+                v-for="q in quickQuestions"
+                :key="q"
+                type="button"
+                class="text-xs px-3 py-2 rounded-full border border-gray-200 bg-white hover:bg-[#00c288]/5 hover:border-[#00c288]/30 transition-all text-gray-700 font-semibold"
+                @click="useQuickQuestion(q)"
+              >
+                {{ q }}
+              </button>
+            </div>
+
             <form class="flex items-end gap-3" @submit.prevent="send">
               <div class="flex-1">
                 <label class="sr-only" for="chat">Message</label>
                 <textarea
                   id="chat"
                   v-model="input"
+                  ref="inputRef"
                   rows="2"
                   placeholder="Type your question…"
                   class="w-full resize-none px-4 py-3 rounded-2xl bg-gray-50 border border-gray-100 focus:ring-2 focus:ring-[#00c288]/20 focus:border-[#00c288]/30 outline-none text-sm"

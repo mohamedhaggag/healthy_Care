@@ -1,5 +1,17 @@
 <script setup>
-import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
+import { useRouter } from 'vue-router'
+
+const router = useRouter()
+
+const scrollToLatest = () => {
+  const el = document.getElementById('latest-articles')
+  if (el) {
+    el.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    return
+  }
+  // Fallback if the section isn't mounted on this page
+  router.push({ path: '/blogs', hash: '#latest-articles' })
+}
 </script>
 
 <template>
@@ -27,7 +39,7 @@ import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
         </p>
 
         <div class="flex flex-wrap gap-8 items-center">
-            <button class="px-8 py-4 bg-white text-dark font-bold rounded-full hover:bg-green-50 transition-all duration-300 flex items-center gap-2 group">
+            <button @click="scrollToLatest" class="px-8 py-4 bg-white text-dark font-bold rounded-full hover:bg-green-50 transition-all duration-300 flex items-center gap-2 group">
                 Explore Articles
                 <font-awesome-icon icon="arrow-right" class="group-hover:translate-x-1 transition-transform" />
             </button>

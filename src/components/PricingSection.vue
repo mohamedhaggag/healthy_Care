@@ -1,34 +1,20 @@
 <script setup>
 import { useRouter } from 'vue-router'
+import { PRICING_PLANS } from '../data/plans'
 
 const router = useRouter()
 
-const plans = [
-  {
-    name: 'Free',
-    price: '0',
-    features: ['5 Days in a Week', '01 Sweatshirt', '01 Bottle of Protein', 'Access to Videos', 'Community Support'],
-    recommended: false,
-    activeFeatures: 2 // First 2 features active
-  },
-  {
-    name: 'Mid',
-    price: '23',
-    features: ['5 Days in a Week', '01 Sweatshirt', '01 Bottle of Protein', 'Access to Videos', 'Community Support'],
-    recommended: true,
-    activeFeatures: 5 // All active
-  },
-  {
-    name: 'Pro',
-    price: '123',
-    features: ['5 Days in a Week', '01 Sweatshirt', '01 Bottle of Protein', 'Access to Videos', 'Community Support', 'Personal Coach'],
-    recommended: false,
-    activeFeatures: 6 // All active
-  }
-]
+const plans = PRICING_PLANS.map(p => ({
+  id: p.id,
+  name: p.name,
+  price: String(p.price),
+  recommended: p.recommended,
+  features: p.features.map(f => f.label),
+  activeFeatures: p.features.filter(f => f.included).length
+}))
 
-const choosePlan = (planName) => {
-  router.push({ path: '/plan', query: { plan: planName } })
+const choosePlan = (planId) => {
+  router.push({ name: 'pricing-plan', params: { plan: planId } })
 }
 </script>
 
@@ -42,7 +28,7 @@ const choosePlan = (planName) => {
       </h2>
 
       <div class="grid md:grid-cols-3 gap-8">
-        <div v-for="(plan, index) in plans" :key="plan.name" 
+        <div v-for="(plan, index) in plans" :key="plan.id" 
              :class="`relative p-8 rounded-3xl transition-all duration-300 ${plan.recommended ? 'bg-white shadow-xl scale-105 border-green-500 border-2 z-10' : 'bg-white shadow-sm hover:shadow-lg border border-gray-100 hover:-translate-y-1'}`"
              data-aos="fade-up" :data-aos-delay="index * 150">
           
@@ -68,7 +54,7 @@ const choosePlan = (planName) => {
             </li>
           </ul>
 
-          <button @click="choosePlan(plan.name)" :class="`w-full py-3 rounded-full font-bold transition-all duration-300 ${plan.recommended ? 'bg-green-600 text-white hover:bg-green-700 shadow-lg shadow-green-200' : 'border border-green-600 text-green-600 hover:bg-green-50'}`">
+          <button @click="choosePlan(plan.id)" :class="`w-full py-3 rounded-full font-bold transition-all duration-300 ${plan.recommended ? 'bg-green-600 text-white hover:bg-green-700 shadow-lg shadow-green-200' : 'border border-green-600 text-green-600 hover:bg-green-50'}`">
             Choose Plan
           </button>
         </div>

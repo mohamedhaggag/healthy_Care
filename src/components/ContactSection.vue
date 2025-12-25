@@ -4,8 +4,7 @@ import { useRouter } from 'vue-router'
 const router = useRouter()
 
 const goContact = () => {
-  // No backend contact page; best "working" CTA is sign up (get started)
-  router.push('/signup')
+  router.push('/contact')
 }
 </script>
 

@@ -1,7 +1,8 @@
 <script setup>
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, watch } from 'vue'
 import { RouterLink, useRouter } from 'vue-router'
 import { useAuth } from '../composables/useAuth'
+import { buildMealsForBMI } from '../services/mealPlan'
 
 const router = useRouter()
 const { user, isAuthenticated } = useAuth()
@@ -13,6 +14,9 @@ onMounted(() => {
     router.push('/login')
   }
 })
+
+const goSpecialistChat = () => router.push('/specialist-chat')
+const goBookAppointment = () => router.push('/appointment')
 
 // Get user profile data
 const userProfile = computed(() => user.value?.profile || {})
@@ -74,67 +78,30 @@ const achievableTarget = computed(() => {
   }
   return { value: 0, timeframe: '2 months' }
 })
-const meals = [
-  {
-    name: 'Breakfast',
-    calories: 100,
-    items: [
-      '1 scrambled egg (100g, unsalted)',
-      '1 tomato (50g, uncooked)',
-      '1 slice whole-wheat bread',
-      '1/2 cup mixed berries',
-      '1 cup green tea (unsweetened)',
-      '1 glass water'
-    ]
-  },
-  {
-    name: 'Mid-Morning',
-    calories: 150,
-    items: [
-      '1 apple (150g)',
-      '1 cup plain yogurt (100g)',
-      '1/4 cup unsalted almonds',
-      '1 cup green tea (unsweetened)',
-      '1 glass water'
-    ]
-  },
-  {
-    name: 'Lunch',
-    calories: 300,
-    items: [
-      '1 cup grilled chicken breast',
-      '1 cup mixed green salad (spinach)',
-      '1/2 cup quinoa (cooked)',
-      '1 tbsp olive oil & lemon juice',
-      '1 glass water'
-    ]
-  },
-  {
-    name: 'Afternoon',
-    calories: 150,
-    items: [
-      '1 cup cottage cheese',
-      '1/2 cup celery sticks',
-      '1/4 cup walnuts',
-      '1 cup green tea',
-      '1 glass water'
-    ]
-  },
-  {
-    name: 'Dinner',
-    calories: 300,
-    items: [
-      '1 cup baked salmon',
-      '1 cup steamed broccoli',
-      '1/2 cup brown rice',
-      '1 tbsp soy sauce (low sodium)',
-      '1 glass water'
-    ]
+const seedKey = computed(() => {
+  const u = user.value || {}
+  const profile = u.profile || {}
+  return `${u.id || u.email || u.name || userName.value}|${profile.height || ''}|${profile.currentWeight || ''}`
+})
+
+const meals = computed(() =>
+  buildMealsForBMI({
+    bmiCategory: bmiCategory.value,
+    seedKey: seedKey.value
+  })
+)
+
+watch(
+  () => [bmiCategory.value, seedKey.value],
+  () => {
+    // When the generated plan changes, reset progress/checks for the meal list.
+    currentMealIndex.value = 0
+    completedMeals.value = new Set()
   }
-]
+)
 
 const nextMeal = () => {
-  if (currentMealIndex.value < meals.length - 1) {
+  if (currentMealIndex.value < meals.value.length - 1) {
     currentMealIndex.value++
   } else {
     currentMealIndex.value = 0
@@ -198,13 +165,13 @@ const isEveningExerciseCompleted = (index) => {
 
 // Select all functions
 const selectAllMeals = () => {
-  meals[currentMealIndex.value].items.forEach((_, index) => {
+  meals.value[currentMealIndex.value].items.forEach((_, index) => {
     completedMeals.value.add(`${currentMealIndex.value}-${index}`)
   })
 }
 
 const clearAllMeals = () => {
-  meals[currentMealIndex.value].items.forEach((_, index) => {
+  meals.value[currentMealIndex.value].items.forEach((_, index) => {
     completedMeals.value.delete(`${currentMealIndex.value}-${index}`)
   })
 }
@@ -250,9 +217,6 @@ const clearAllEveningExercises = () => {
             <p class="text-xl text-gray-200 mb-8">
               Get a routine tailored specifically to your {{ userProfile.goal || 'health' }} goals.
             </p>
-            <button class="px-8 py-3 bg-[#c8ff00] text-[#0a3d2e] font-semibold rounded-lg hover:bg-[#b3e600] transition-colors shadow-lg">
-              Start Now
-            </button>
           </div>
           
           <!-- Right Side - Stats Card -->
@@ -328,7 +292,7 @@ const clearAllEveningExercises = () => {
               <div class="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
                 <font-awesome-icon icon="weight" class="text-primary text-2xl" />
               </div>
-              <div class="text-5xl font-bold text-primary mb-2">{{ bmi }}</div>
+              <div class="text-4xl font-bold text-primary mb-2">{{ bmi }}</div>
               <div class="text-gray-600 font-semibold text-sm uppercase tracking-wide">BMI Index</div>
               <div class="mt-3 px-3 py-1 bg-primary/10 rounded-full inline-block">
                 <span class="text-sm font-bold text-primary">{{ bmiCategory }}</span>
@@ -338,14 +302,14 @@ const clearAllEveningExercises = () => {
               <div class="w-16 h-16 bg-blue-50 rounded-full flex items-center justify-center mx-auto mb-4">
                 <font-awesome-icon icon="chart-pie" class="text-blue-500 text-2xl" />
               </div>
-              <div class="text-5xl font-bold text-blue-500 mb-2">{{ bmiCategory }}</div>
+              <div class="text-3xl md:text-4xl font-bold text-blue-500 mb-2">{{ bmiCategory }}</div>
               <div class="text-gray-600 font-semibold text-sm uppercase tracking-wide">Category</div>
             </div>
             <div class="bg-white rounded-2xl p-6 text-center shadow-lg hover:shadow-xl transition-shadow duration-300" data-aos="zoom-in" data-aos-delay="300">
               <div class="w-16 h-16 bg-orange-50 rounded-full flex items-center justify-center mx-auto mb-4">
                 <font-awesome-icon icon="bullseye" class="text-orange-500 text-2xl" />
               </div>
-              <div class="text-4xl font-bold text-orange-500 mb-2">
+              <div class="text-3xl md:text-4xl font-bold text-orange-500 mb-2">
                 {{ weightDifference.value }}KG
               </div>
               <div class="text-gray-600 font-semibold text-sm uppercase tracking-wide">{{ weightDifference.type }}</div>
@@ -354,7 +318,7 @@ const clearAllEveningExercises = () => {
               <div class="w-16 h-16 bg-green-50 rounded-full flex items-center justify-center mx-auto mb-4">
                 <font-awesome-icon icon="trophy" class="text-green-500 text-2xl" />
               </div>
-              <div class="text-4xl font-bold text-green-500 mb-2">
+              <div class="text-3xl md:text-4xl font-bold text-green-500 mb-2">
                 {{ achievableTarget.value }}KG
               </div>
               <div class="text-gray-600 font-semibold text-sm uppercase tracking-wide">Target</div>
@@ -642,11 +606,11 @@ const clearAllEveningExercises = () => {
               <h3 class="text-3xl md:text-4xl font-bold mb-2">Dr. Ahmed Hassan</h3>
               <p class="text-green-100 text-lg mb-6">Nutritionist & Wellness Expert</p>
               <div class="flex flex-col sm:flex-row gap-4 justify-center md:justify-start">
-                <button class="px-8 py-4 bg-white text-primary font-bold rounded-xl hover:bg-gray-100 transition-all duration-300 shadow-xl hover:shadow-2xl flex items-center justify-center gap-2">
+                <button @click="goSpecialistChat" class="px-8 py-4 bg-white text-primary font-bold rounded-xl hover:bg-gray-100 transition-all duration-300 shadow-xl hover:shadow-2xl flex items-center justify-center gap-2">
                   <font-awesome-icon icon="comment-dots" />
                   <span>Chat with Specialist</span>
                 </button>
-                <button class="px-8 py-4 bg-white/10 backdrop-blur-sm text-white font-bold rounded-xl hover:bg-white/20 transition-all duration-300 border-2 border-white/30 flex items-center justify-center gap-2">
+                <button @click="goBookAppointment" class="px-8 py-4 bg-white/10 backdrop-blur-sm text-white font-bold rounded-xl hover:bg-white/20 transition-all duration-300 border-2 border-white/30 flex items-center justify-center gap-2">
                   <font-awesome-icon icon="calendar" />
                   <span>Book Appointment</span>
                 </button>

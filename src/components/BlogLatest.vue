@@ -34,7 +34,7 @@ const articles = [
 </script>
 
 <template>
-  <section class="py-20 bg-gray-50">
+  <section id="latest-articles" class="py-20 bg-gray-50">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div class="flex justify-between items-end mb-12" data-aos="fade-right">
         <div>

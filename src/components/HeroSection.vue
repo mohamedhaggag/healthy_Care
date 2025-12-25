@@ -11,11 +11,6 @@ const scrollToPlans = () => {
   }
   router.push('/plan')
 }
-
-const watchVideo = () => {
-  // Replace with your own video URL if you want
-  window.open('https://www.youtube.com/watch?v=IodB8dJ8w1Y', '_blank', 'noopener,noreferrer')
-}
 </script>
 
 <template>
@@ -41,12 +36,6 @@ const watchVideo = () => {
           <div class="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start mb-12" data-aos="fade-up" data-aos-delay="200">
             <button @click="scrollToPlans" class="bg-primary text-white font-semibold px-8 py-3.5 rounded-full shadow-lg shadow-primary/30 hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
               View Our Plans
-            </button>
-            <button @click="watchVideo" class="group flex items-center justify-center gap-2 bg-white text-dark font-semibold px-8 py-3.5 rounded-full border border-gray-200 hover:border-primary/50 hover:text-primary transition-all duration-300">
-              <span class="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center group-hover:bg-primary group-hover:text-white transition-colors">
-                <font-awesome-icon icon="play" class="text-xs ml-0.5" />
-              </span>
-              Watch Video
             </button>
           </div>
           

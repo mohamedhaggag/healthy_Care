@@ -21,6 +21,10 @@ const goToExpert = (id) => {
   router.push(`/experts/${id}`)
 }
 
+const goToConsultation = (id) => {
+  router.push({ name: 'expert-connect', params: { id } })
+}
+
 const goToAll = () => {
   router.push('/experts')
 }
@@ -58,7 +62,10 @@ const goToAll = () => {
             <h3 class="text-xl font-bold text-dark mb-1">{{ expert.name }}</h3>
             <p class="text-primary font-medium mb-4">{{ expert.role }}</p>
             
-            <button class="w-full py-2 border border-green-500/30 text-green-600 rounded-full hover:bg-green-500 hover:text-white transition-colors duration-300">
+            <button
+              class="w-full py-2 border border-green-500/30 text-green-600 rounded-full hover:bg-green-500 hover:text-white transition-colors duration-300"
+              @click="goToConsultation(expert.id)"
+            >
               Book Appointment
             </button>
           </div>

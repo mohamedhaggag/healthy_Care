@@ -31,6 +31,10 @@ const avatar = computed(() => {
   return doctor.value?.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(doctor.value?.name || 'Doctor')}&background=00c288&color=fff`
 })
 
+const goConsultation = () => {
+  router.push({ name: 'expert-connect', params: { id: doctorId.value } })
+}
+
 onMounted(() => {
   window.scrollTo(0, 0)
 })
@@ -115,7 +119,7 @@ onMounted(() => {
             </div>
           </div>
 
-          <button class="bg-green-600 text-white px-8 py-3 rounded-md font-bold hover:bg-green-700 shadow-md transition-colors">
+          <button @click="goConsultation" class="bg-green-600 text-white px-8 py-3 rounded-md font-bold hover:bg-green-700 shadow-md transition-colors">
             Book a Consultation
           </button>
         </div>

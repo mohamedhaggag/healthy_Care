@@ -95,6 +95,15 @@ export function useAuth() {
     // Save registered users to localStorage
     if (typeof window !== 'undefined') {
       localStorage.setItem('registeredUsers', JSON.stringify(registeredUsers.value))
+      // Persist the user's profile so doctor/admin pages can read it later (dynamic dashboard).
+      try {
+        localStorage.setItem(
+          `userProfile:${String(userData.email || '').toLowerCase()}`,
+          JSON.stringify(authData.profile || {})
+        )
+      } catch {
+        // ignore
+      }
     }
 
     user.value = authData

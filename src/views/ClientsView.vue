@@ -113,7 +113,7 @@
                     <font-awesome-icon icon="eye" class="text-[10px]" />
                     View
                   </router-link>
-                  <router-link to="/doctor-messages" class="flex items-center gap-2 px-4 py-2 bg-[#0a4d8c] text-white rounded-xl text-xs font-bold hover:bg-[#083d70] transition-all active:scale-95 shadow-sm">
+                  <router-link :to="`/doctor-messages?client=${client.id}`" class="flex items-center gap-2 px-4 py-2 bg-[#0a4d8c] text-white rounded-xl text-xs font-bold hover:bg-[#083d70] transition-all active:scale-95 shadow-sm">
                     <font-awesome-icon icon="comment" class="text-[10px]" />
                     Chat
                   </router-link>
@@ -147,32 +147,33 @@
 </template>
 
 <script setup>
-import { ref, computed, watch } from 'vue'
+import { computed, ref, watch } from 'vue'
 import DoctorSidebar from '../components/DoctorSidebar.vue'
+import { useAuth } from '../composables/useAuth'
+import { buildDoctorClients, getCurrentDoctor } from '../services/doctorPortal'
+
+const { user } = useAuth()
 
 const searchQuery = ref('')
 const activeFilter = ref('All')
 
-const stats = [
-  { label: 'Total Clients', value: '12', bgColor: '#c2d6ff' },
-  { label: 'Compliant', value: '6', bgColor: '#e7f9f0', icon: 'check_circle', iconColor: 'text-green-500' },
-  { label: 'Needs Support', value: '4', bgColor: '#fff4e5', icon: 'warning', iconColor: 'text-orange-500' },
-  { label: 'At Risk', value: '2', bgColor: '#fee2e2', icon: 'error', iconColor: 'text-red-500' }
-]
-
 const filters = ['All', 'Weight Loss', 'Weight Gain', 'Health Improvement']
 
-const clients = ref([
-  { id: 1, name: 'Mohamed Ali', avatar: 'https://randomuser.me/api/portraits/men/32.jpg', goal: 'Weight Loss', weight: 84, progress: 65, progressColor: '#f59e0b', status: 'Compliant', lastUpdate: '1 day ago' },
-  { id: 2, name: 'Mohamed Ali', avatar: 'https://randomuser.me/api/portraits/men/44.jpg', goal: 'Weight Gain', weight: 75, progress: 82, progressColor: '#0a4d8c', status: 'Compliant', lastUpdate: 'Yesterday' },
-  { id: 3, name: 'Mohamed Ali', avatar: 'https://randomuser.me/api/portraits/men/12.jpg', goal: 'Weight Loss', weight: 84, progress: 65, progressColor: '#f59e0b', status: 'Compliant', lastUpdate: '1 day ago' },
-  { id: 4, name: 'Mohamed Ali', avatar: 'https://randomuser.me/api/portraits/men/55.jpg', goal: 'Weight Gain', weight: 75, progress: 82, progressColor: '#0a4d8c', status: 'Compliant', lastUpdate: 'Yesterday' },
-  { id: 5, name: 'Mohamed Ali', avatar: 'https://randomuser.me/api/portraits/men/21.jpg', goal: 'Weight Loss', weight: 84, progress: 65, progressColor: '#f59e0b', status: 'Compliant', lastUpdate: '1 day ago' },
-  { id: 6, name: 'Mohamed Ali', avatar: 'https://randomuser.me/api/portraits/men/66.jpg', goal: 'Weight Gain', weight: 75, progress: 82, progressColor: '#0a4d8c', status: 'Compliant', lastUpdate: 'Yesterday' },
-  { id: 7, name: 'Mohamed Ali', avatar: 'https://randomuser.me/api/portraits/men/77.jpg', goal: 'Weight Loss', weight: 84, progress: 65, progressColor: '#f59e0b', status: 'Compliant', lastUpdate: '1 day ago' },
-  { id: 8, name: 'Mohamed Ali', avatar: 'https://randomuser.me/api/portraits/men/88.jpg', goal: 'Weight Gain', weight: 75, progress: 82, progressColor: '#0a4d8c', status: 'Compliant', lastUpdate: 'Yesterday' },
-  { id: 9, name: 'Mohamed Ali', avatar: 'https://randomuser.me/api/portraits/men/99.jpg', goal: 'Weight Gain', weight: 75, progress: 82, progressColor: '#0a4d8c', status: 'Compliant', lastUpdate: 'Yesterday' }
-])
+const doctor = computed(() => getCurrentDoctor(user.value))
+const clients = computed(() => buildDoctorClients(doctor.value))
+
+const stats = computed(() => {
+  const list = clients.value
+  const compliant = list.filter(c => c.status === 'Compliant').length
+  const needsSupport = list.filter(c => c.status === 'Needs Support').length
+  const atRisk = list.filter(c => c.status === 'At Risk').length
+  return [
+    { label: 'Total Clients', value: String(list.length), bgColor: '#c2d6ff' },
+    { label: 'Compliant', value: String(compliant), bgColor: '#e7f9f0', icon: 'check_circle', iconColor: 'text-green-500' },
+    { label: 'Needs Support', value: String(needsSupport), bgColor: '#fff4e5', icon: 'warning', iconColor: 'text-orange-500' },
+    { label: 'At Risk', value: String(atRisk), bgColor: '#fee2e2', icon: 'error', iconColor: 'text-red-500' }
+  ]
+})
 
 const filteredClients = computed(() => {
   const q = searchQuery.value.trim().toLowerCase()

@@ -60,12 +60,15 @@
 
 <script setup>
 import { useRouter, useRoute } from 'vue-router'
+import { useAuth } from '../composables/useAuth'
 
 const router = useRouter()
 const route = useRoute()
+const { logout } = useAuth()
 
 const handleLogout = () => {
   localStorage.removeItem('doctor_auth')
+  logout()
   router.push('/login')
 }
 </script>

@@ -55,7 +55,6 @@ watch(localCategory, (v) => emit('update:category', v))
              <font-awesome-icon v-if="localCategory === cat.name" icon="check" class="text-white text-[10px]" />
           </div>
           <span :class="{'font-medium text-green-600': localCategory === cat.name}">{{ cat.name }}</span>
-          <span class="text-xs text-gray-400 ml-auto">({{ cat.count }})</span>
         </li>
       </ul>
     </div>

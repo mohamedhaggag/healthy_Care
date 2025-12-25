@@ -16,6 +16,11 @@ const router = createRouter({
             component: () => import('../views/PlanView.vue')
         },
         {
+            path: '/plans/:plan',
+            name: 'pricing-plan',
+            component: () => import('../views/PricingPlanView.vue')
+        },
+        {
             path: '/shop',
             name: 'shop',
             component: ShopView
@@ -36,6 +41,11 @@ const router = createRouter({
             component: () => import('../views/DoctorProfileView.vue')
         },
         {
+            path: '/experts/:id/connect',
+            name: 'expert-connect',
+            component: () => import('../views/DoctorConnectView.vue')
+        },
+        {
             path: '/experts',
             name: 'experts',
             component: () => import('../views/ExpertsView.vue')
@@ -44,6 +54,21 @@ const router = createRouter({
             path: '/ai-chat',
             name: 'ai-chat',
             component: () => import('../views/AiChatView.vue')
+        },
+        {
+            path: '/specialist-chat',
+            name: 'specialist-chat',
+            component: () => import('../views/SpecialistChatView.vue')
+        },
+        {
+            path: '/appointment',
+            name: 'appointment',
+            component: () => import('../views/AppointmentView.vue')
+        },
+        {
+            path: '/contact',
+            name: 'contact',
+            component: () => import('../views/ContactUsView.vue')
         },
         {
             path: '/login',

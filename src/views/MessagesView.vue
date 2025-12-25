@@ -87,7 +87,7 @@
 
         <!-- Messages Content -->
         <div class="flex-1 overflow-y-auto p-8 space-y-8 scrollbar-hide bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] bg-fixed opacity-90">
-          <div v-for="(msg, index) in messages" :key="index" :class="['flex flex-col', msg.sender === 'me' ? 'items-end' : 'items-start']">
+          <div v-for="(msg, index) in thread" :key="index" :class="['flex flex-col', msg.sender === 'me' ? 'items-end' : 'items-start']">
             <div 
               :class="[
                 'max-w-[70%] p-5 rounded-[25px] shadow-sm text-sm leading-relaxed mb-2',
@@ -146,50 +146,90 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { computed, onMounted, ref, watch } from 'vue'
+import { useRoute } from 'vue-router'
 import DoctorSidebar from '../components/DoctorSidebar.vue'
+import { useAuth } from '../composables/useAuth'
+import { buildDoctorClients, getCurrentDoctor, loadThread, saveThread } from '../services/doctorPortal'
+
+const route = useRoute()
+const { user } = useAuth()
 
 const searchQuery = ref('')
-const activeConvoId = ref(1)
+const activeConvoId = ref('')
 const newMessage = ref('')
 
-const conversations = ref([
-  { id: 1, name: 'Mohamed Ali', avatar: 'https://randomuser.me/api/portraits/men/32.jpg', goal: 'Weight Loss', lastMessage: 'Thank you doctor! I\'ll follow the new meal plan.', time: '10:30 AM', unread: 2, online: true },
-  { id: 2, name: 'Saleh Johnson', avatar: 'https://randomuser.me/api/portraits/men/44.jpg', goal: 'Weight Gain', lastMessage: 'I gained 2kg this month! 🎉', time: 'Yesterday', unread: 0, online: false },
-  { id: 3, name: 'Ahmed Hassan', avatar: 'https://randomuser.me/api/portraits/men/12.jpg', goal: 'Health Improvement', lastMessage: 'When is my next appointment?', time: '2 days ago', unread: 1, online: true },
-  { id: 4, name: 'Fady Ali', avatar: 'https://randomuser.me/api/portraits/men/65.jpg', goal: 'Weight Loss', lastMessage: 'The workout plan is great!', time: '3 days ago', unread: 0, online: false },
-  { id: 5, name: 'Omar Khalil', avatar: 'https://randomuser.me/api/portraits/men/77.jpg', goal: 'Weight Gain', lastMessage: 'Need help with protein intake', time: '1 week ago', unread: 3, online: true }
-])
+const doctor = computed(() => getCurrentDoctor(user.value))
+const clients = computed(() => buildDoctorClients(doctor.value))
 
-const messages = ref([
-  { sender: 'me', text: 'Good morning Mohamed! Of course, what would you like to know?', time: '10:18 AM' },
-  { sender: 'client', text: 'Can I substitute quinoa with brown rice in my lunch?', time: '10:20 AM' },
-  { sender: 'me', text: 'Absolutely! Brown rice is a great alternative. Just keep the portion size similar - about 150g cooked rice.', time: '10:22 AM' },
-  { sender: 'client', text: 'Perfect! One more thing - I\'m traveling next week. Should I adjust my workout?', time: '10:25 AM' },
-  { sender: 'me', text: 'Good question. Try to maintain at least 30 minutes of cardio daily. Hotel gyms or even a brisk walk works great. I\'ll send you a travel-friendly workout plan.', time: '10:28 AM' },
-  { sender: 'client', text: 'Thank you doctor! I\'ll follow the new meal plan.', time: '10:30 AM' }
-])
+const thread = ref([])
+
+const buildConvo = (c) => {
+  const msgs = loadThread(doctor.value, c.id)
+  const last = msgs[msgs.length - 1]
+  return {
+    id: c.id,
+    name: c.name,
+    avatar: c.avatar,
+    goal: c.goal,
+    lastMessage: last?.text || 'No messages yet.',
+    time: last?.time || '',
+    unread: 0,
+    online: true
+  }
+}
+
+const conversations = computed(() => clients.value.map(buildConvo))
 
 const filteredConversations = computed(() => {
-  return conversations.value.filter(c => 
-    c.name.toLowerCase().includes(searchQuery.value.toLowerCase())
-  )
+  const q = searchQuery.value.trim().toLowerCase()
+  return conversations.value.filter(c => !q || c.name.toLowerCase().includes(q))
 })
 
 const activeConversation = computed(() => {
-  return conversations.value.find(c => c.id === activeConvoId.value)
+  return conversations.value.find(c => c.id === activeConvoId.value) || null
+})
+
+const loadActiveThread = () => {
+  if (!activeConvoId.value) {
+    thread.value = []
+    return
+  }
+  thread.value = loadThread(doctor.value, activeConvoId.value)
+  if (!Array.isArray(thread.value) || thread.value.length === 0) {
+    thread.value = [
+      {
+        sender: 'client',
+        text: 'Hi doctor, I need help with my plan.',
+        time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+      }
+    ]
+    saveThread(doctor.value, activeConvoId.value, thread.value)
+  }
+}
+
+watch([activeConvoId, doctor], () => loadActiveThread(), { immediate: true })
+
+onMounted(() => {
+  const initial = String(route.query.client || '')
+  if (initial) {
+    activeConvoId.value = initial
+    return
+  }
+  if (conversations.value.length) activeConvoId.value = conversations.value[0].id
 })
 
 const sendMessage = () => {
   if (!newMessage.value.trim()) return
   
-  messages.value.push({
+  thread.value.push({
     sender: 'me',
     text: newMessage.value,
     time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
   })
   
   newMessage.value = ''
+  saveThread(doctor.value, activeConvoId.value, thread.value)
 }
 </script>
 
